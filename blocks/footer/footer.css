@@ -1,20 +1,206 @@
+/* Allianz footer — mobile-first */
+/* stylelint-disable no-descending-specificity */
+
+:root {
+  --allianz-blue: rgb(0 55 129);
+  --allianz-legal-link: rgb(63 114 177);
+  --footer-band: rgb(240 244 250);
+  --footer-border: rgb(224 224 224);
+}
+
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  background-color: #fff;
+  font-family: "Allianz Neo", "Helvetica Neue", helvetica, arial, sans-serif;
+  font-size: 16px;
 }
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+footer .footer-inner {
+  color: var(--allianz-blue);
 }
 
-footer .footer p {
+footer .footer-inner a {
+  color: var(--allianz-blue);
+  text-decoration: none;
+}
+
+footer .footer-inner ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+footer .footer-inner p {
   margin: 0;
 }
 
+/* ---------- Link columns ---------- */
+footer .footer-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--footer-band);
+  padding: 32px 16px;
+}
+
+footer .footer-column {
+  border-bottom: 1px solid var(--footer-border);
+}
+
+footer .footer-column h3 {
+  margin: 0;
+  padding: 16px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--allianz-blue);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+/* accordion chevron (mobile) */
+footer .footer-column h3::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--allianz-blue);
+  border-bottom: 2px solid var(--allianz-blue);
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+  margin-right: 4px;
+}
+
+footer .footer-column[aria-expanded="true"] h3::after {
+  transform: rotate(-135deg);
+}
+
+/* collapsed by default on mobile; expand when open */
+footer .footer-column ul {
+  display: none;
+  padding-bottom: 12px;
+}
+
+footer .footer-column[aria-expanded="true"] ul {
+  display: block;
+}
+
+footer .footer-column ul li a {
+  display: inline-block;
+  padding: 8px 0;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+footer .footer-column ul li a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Social row ---------- */
+footer .footer-social {
+  text-align: center;
+  padding: 24px 16px 40px;
+}
+
+footer .footer-social-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--allianz-blue);
+  margin: 0 0 24px;
+}
+
+footer .footer-social-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
+
+footer .footer-social-list li a {
+  display: inline-flex;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+footer .footer-social-list li a:hover {
+  opacity: 0.6;
+}
+
+footer .footer-social-list img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+/* ---------- Legal bar ---------- */
+footer .footer-legal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 16px;
+  border-top: 1px solid var(--footer-border);
+}
+
+footer .footer-copyright {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--allianz-blue);
+}
+
+footer .footer-legal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+}
+
+footer .footer-legal-list li a {
+  color: var(--allianz-legal-link);
+  font-size: 16px;
+}
+
+footer .footer-legal-list li a:hover {
+  text-decoration: underline;
+}
+
+/* ================= Tablet / Desktop ================= */
 @media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  footer .footer-columns {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 40px 52px;
+  }
+
+  footer .footer-column {
+    flex: 1 1 0;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  footer .footer-social {
+    padding: 24px 52px 40px;
+  }
+
+  footer .footer-legal {
+    flex-direction: row;
+    align-items: center;
+    gap: 28px;
+    padding: 20px 52px;
+  }
+
+  /* desktop: columns always expanded, no accordion chrome */
+  footer .footer-column h3 {
+    padding: 0 0 12px;
+    cursor: default;
+    display: block;
+  }
+
+  footer .footer-column h3::after {
+    display: none;
+  }
+
+  footer .footer-column ul,
+  footer .footer-column[aria-expanded="true"] ul {
+    display: block;
+    padding-bottom: 0;
   }
 }
