@@ -1,171 +1,498 @@
-import { getMetadata } from '../../scripts/aem.js';
-import { loadFragment } from '../fragment/fragment.js';
+// Hyundai Motor Brasil header — transparent overlay bar with full-width megamenu panels.
+// Content-first: all copy, links, and image refs live in /content/nav.plain.html.
+// header.js fetches that fragment, reads its DOM, and builds the interactive header.
 
-// media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
 
-function closeOnEscape(e) {
-  if (e.code === 'Escape') {
-    const nav = document.getElementById('nav');
-    const navSections = nav.querySelector('.nav-sections');
-    if (!navSections) return;
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
-    if (navSectionExpanded && isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleAllNavSections(navSections);
-      navSectionExpanded.focus();
-    } else if (!isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleMenu(nav, navSections);
-      nav.querySelector('button').focus();
-    }
-  }
-}
-
-function closeOnFocusLost(e) {
-  const nav = e.currentTarget;
-  if (!nav.contains(e.relatedTarget)) {
-    const navSections = nav.querySelector('.nav-sections');
-    if (!navSections) return;
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
-    if (navSectionExpanded && isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleAllNavSections(navSections, false);
-    } else if (!isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleMenu(nav, navSections, false);
-    }
-  }
-}
-
-function openOnKeydown(e) {
-  const focused = document.activeElement;
-  const isNavDrop = focused.className === 'nav-drop';
-  if (isNavDrop && (e.code === 'Enter' || e.code === 'Space')) {
-    const dropExpanded = focused.getAttribute('aria-expanded') === 'true';
-    // eslint-disable-next-line no-use-before-define
-    toggleAllNavSections(focused.closest('.nav-sections'));
-    focused.setAttribute('aria-expanded', dropExpanded ? 'false' : 'true');
-  }
-}
-
-function focusNavSection() {
-  document.activeElement.addEventListener('keydown', openOnKeydown);
+/**
+ * Fetch the nav fragment. Metadata-independent dual-fetch:
+ * /content first (localhost / aem up), then root (DA/EDS production).
+ * @returns {Promise<Document|null>}
+ */
+async function fetchNav() {
+  let resp = await fetch('/content/nav.plain.html');
+  if (!resp.ok) resp = await fetch('/nav.plain.html');
+  if (!resp.ok) return null;
+  const html = await resp.text();
+  return new DOMParser().parseFromString(html, 'text/html');
 }
 
 /**
- * Toggles all nav sections
- * @param {Element} sections The container element
- * @param {Boolean} expanded Whether the element should be expanded or collapsed
+ * Split an <li>'s content into its own label/link (direct children) and its
+ * nested submenu <ul> (if any). Ignores content inside the nested <ul>.
+ * @param {HTMLLIElement} li
+ * @returns {{label: string, link: HTMLAnchorElement|null, submenu: HTMLUListElement|null}}
  */
-function toggleAllNavSections(sections, expanded = false) {
-  if (!sections) return;
-  sections.querySelectorAll('.nav-sections .default-content-wrapper > ul > li').forEach((section) => {
-    section.setAttribute('aria-expanded', expanded);
+function readItem(li) {
+  const submenu = li.querySelector(':scope > ul');
+  const link = li.querySelector(':scope > a');
+  let label = '';
+  li.childNodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) label += node.textContent;
+    else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'A') label += node.textContent;
   });
+  label = label.trim();
+  if (!label && link) label = link.textContent.trim();
+  return { label, link, submenu };
 }
 
 /**
- * Toggles the entire nav
- * @param {Element} nav The container element
- * @param {Element} navSections The nav sections within the container element
- * @param {*} forceExpanded Optional param to force nav expand behavior when not null
+ * Build a card link (icon/thumbnail above a label) from an <li> whose <a> holds an image.
+ * @param {HTMLLIElement} li
+ * @returns {HTMLAnchorElement}
  */
-function toggleMenu(nav, navSections, forceExpanded = null) {
-  const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
-  const button = nav.querySelector('.nav-hamburger button');
-  document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
-  nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
-  button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
-  // enable nav dropdown keyboard accessibility
-  if (navSections) {
-    const navDrops = navSections.querySelectorAll('.nav-drop');
-    if (isDesktop.matches) {
-      navDrops.forEach((drop) => {
-        if (!drop.hasAttribute('tabindex')) {
-          drop.setAttribute('tabindex', 0);
-          drop.addEventListener('focus', focusNavSection);
-        }
+function buildCard(li) {
+  const { link } = readItem(li);
+  const a = document.createElement('a');
+  a.className = 'hh-card';
+  a.href = link ? link.getAttribute('href') : '#';
+  const img = link ? link.querySelector('img') : null;
+  if (img) {
+    const fresh = img.cloneNode(true);
+    a.append(fresh);
+  }
+  const span = document.createElement('span');
+  span.textContent = readItem(li).label;
+  a.append(span);
+  return a;
+}
+
+/** Build a plain text link from an <li>. */
+function buildTextLink(li) {
+  const { label, link } = readItem(li);
+  const a = document.createElement('a');
+  a.className = 'hh-link';
+  a.href = link ? link.getAttribute('href') : '#';
+  a.textContent = label;
+  return a;
+}
+
+/**
+ * Standard "icon cards + text-link column" panel.
+ * Cards = <li>s whose <a> contains an <img>; text links = the remaining <li>s.
+ * @param {HTMLUListElement} submenu
+ * @returns {HTMLElement}
+ */
+function buildCardsAndLinksPanel(submenu) {
+  const panel = document.createElement('div');
+  panel.className = 'hh-panel hh-panel-cards';
+  const cardsWrap = document.createElement('div');
+  cardsWrap.className = 'hh-cards';
+  const linksWrap = document.createElement('div');
+  linksWrap.className = 'hh-links';
+  [...submenu.children].forEach((li) => {
+    const { link } = readItem(li);
+    if (link && link.querySelector('img')) cardsWrap.append(buildCard(li));
+    else linksWrap.append(buildTextLink(li));
+  });
+  if (cardsWrap.children.length) panel.append(cardsWrap);
+  if (linksWrap.children.length) panel.append(linksWrap);
+  return panel;
+}
+
+/**
+ * Dealer-search panel (icon cards + a search form). Form controls are built here,
+ * copy (heading, radio labels, input placeholder) is read from the fragment DOM.
+ * @param {HTMLLIElement} triggerLi the Concessionárias <li>
+ * @returns {HTMLElement}
+ */
+function buildDealerSearchPanel(triggerLi) {
+  const panel = document.createElement('div');
+  panel.className = 'hh-panel hh-panel-dealer';
+
+  const cardsWrap = document.createElement('div');
+  cardsWrap.className = 'hh-cards';
+  const cardsUl = triggerLi.querySelector(':scope > ul');
+  if (cardsUl) [...cardsUl.children].forEach((li) => cardsWrap.append(buildCard(li)));
+  panel.append(cardsWrap);
+
+  // Right-side column wrapper (a div, so the search block is a countable region).
+  const formCol = document.createElement('div');
+  formCol.className = 'hh-dealer-col';
+
+  const form = document.createElement('form');
+  form.className = 'hh-dealer-form';
+  form.addEventListener('submit', (e) => e.preventDefault());
+
+  const heading = triggerLi.querySelector(':scope > h3');
+  if (heading) {
+    const h = document.createElement('p');
+    h.className = 'hh-dealer-title';
+    h.textContent = heading.textContent.trim();
+    form.append(h);
+  }
+
+  const optionsUl = [...triggerLi.querySelectorAll(':scope > ul')][1];
+  if (optionsUl) {
+    const opts = document.createElement('div');
+    opts.className = 'hh-dealer-options';
+    [...optionsUl.children].forEach((li, i) => {
+      const id = `hh-dealer-opt-${i}`;
+      const wrap = document.createElement('label');
+      wrap.className = 'hh-radio';
+      wrap.htmlFor = id;
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'hh-dealer-mode';
+      input.id = id;
+      if (i === 1) input.checked = true;
+      const txt = document.createElement('span');
+      txt.textContent = li.textContent.trim();
+      wrap.append(input, txt);
+      opts.append(wrap);
+    });
+    form.append(opts);
+  }
+
+  const placeholder = triggerLi.querySelector(':scope > p');
+  const inputRow = document.createElement('div');
+  inputRow.className = 'hh-dealer-input';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.setAttribute('aria-label', placeholder ? placeholder.textContent.trim() : 'Buscar');
+  input.placeholder = placeholder ? placeholder.textContent.trim() : '';
+  const submit = document.createElement('button');
+  submit.type = 'submit';
+  submit.className = 'hh-dealer-submit';
+  submit.setAttribute('aria-label', 'Buscar');
+  inputRow.append(input, submit);
+  form.append(inputRow);
+
+  formCol.append(form);
+  panel.append(formCol);
+  return panel;
+}
+
+/**
+ * Vehicles panel: featured detail (image + specs) on the left,
+ * category tabs + selectable thumbnail grid on the right.
+ * @param {HTMLUListElement} submenu the Veículos <ul>
+ * @returns {HTMLElement}
+ */
+function buildVehiclesPanel(submenu) {
+  const panel = document.createElement('div');
+  panel.className = 'hh-panel hh-panel-vehicles';
+
+  const tabs = [];
+  const vehicles = [];
+  [...submenu.children].forEach((li) => {
+    const nested = li.querySelector(':scope > ul');
+    const link = li.querySelector(':scope > a');
+    if (link && nested) {
+      // Specs are alternating <li> nodes: label, value, label, value, …
+      // plus a trailing "Segmento: <x>" line used only for tab filtering.
+      const rawSpecs = [...nested.children].map((s) => s.textContent.trim());
+      let segment = '';
+      const flat = rawSpecs.filter((s) => {
+        if (s.toLowerCase().startsWith('segmento:')) { segment = s.split(':')[1].trim(); return false; }
+        return true;
       });
-    } else {
-      navDrops.forEach((drop) => {
-        drop.removeAttribute('tabindex');
-        drop.removeEventListener('focus', focusNavSection);
+      const specPairs = [];
+      for (let i = 0; i < flat.length; i += 2) {
+        specPairs.push({ label: flat[i] || '', value: flat[i + 1] || '' });
+      }
+      vehicles.push({
+        label: readItem(li).label,
+        href: link.getAttribute('href'),
+        img: link.querySelector('img'),
+        specs: specPairs,
+        segment,
       });
+    } else if (!link) {
+      tabs.push(readItem(li).label);
     }
-  }
-
-  // enable menu collapse on escape keypress
-  if (!expanded || isDesktop.matches) {
-    // collapse menu on escape press
-    window.addEventListener('keydown', closeOnEscape);
-    // collapse menu on focus lost
-    nav.addEventListener('focusout', closeOnFocusLost);
-  } else {
-    window.removeEventListener('keydown', closeOnEscape);
-    nav.removeEventListener('focusout', closeOnFocusLost);
-  }
-}
-
-/**
- * loads and decorates the header, mainly the nav
- * @param {Element} block The header block element
- */
-export default async function decorate(block) {
-  // load nav as fragment
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  const fragment = await loadFragment(navPath);
-
-  // decorate nav DOM
-  block.textContent = '';
-  const nav = document.createElement('nav');
-  nav.id = 'nav';
-  while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
-
-  const classes = ['brand', 'sections', 'tools'];
-  classes.forEach((c, i) => {
-    const section = nav.children[i];
-    if (section) section.classList.add(`nav-${c}`);
   });
 
-  const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
-  }
+  // Featured detail (left)
+  const featured = document.createElement('a');
+  featured.className = 'hh-featured';
+  const fImg = document.createElement('img');
+  const fName = document.createElement('span');
+  fName.className = 'hh-featured-name';
+  const fSpecs = document.createElement('dl');
+  fSpecs.className = 'hh-featured-specs';
+  featured.append(fName, fImg, fSpecs);
 
-  const navSections = nav.querySelector('.nav-sections');
-  if (navSections) {
-    navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
-      navSection.addEventListener('click', () => {
-        if (isDesktop.matches) {
-          const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          toggleAllNavSections(navSections);
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        }
+  const setFeatured = (v) => {
+    featured.href = v.href;
+    fName.textContent = v.label;
+    if (v.img) { fImg.src = v.img.getAttribute('src'); fImg.alt = v.label; }
+    fSpecs.textContent = '';
+    v.specs.forEach((pair) => {
+      const dt = document.createElement('dt');
+      dt.className = 'hh-spec-title';
+      const dd = document.createElement('dd');
+      dt.textContent = pair.label;
+      dd.textContent = pair.value;
+      fSpecs.append(dt, dd);
+    });
+  };
+  if (vehicles.length) setFeatured(vehicles[0]);
+
+  // Right side: tabs + grid
+  const right = document.createElement('div');
+  right.className = 'hh-vehicles-right';
+
+  const tabRow = document.createElement('div');
+  tabRow.className = 'hh-tabs';
+  const grid = document.createElement('div');
+  grid.className = 'hh-vehicle-grid';
+
+  const cards = vehicles.map((v) => {
+    const a = document.createElement('a');
+    a.className = 'hh-vehicle-card';
+    a.href = v.href;
+    if (v.img) {
+      const im = v.img.cloneNode(true);
+      im.alt = v.label;
+      a.append(im);
+    }
+    const s = document.createElement('span');
+    s.textContent = v.label;
+    a.append(s);
+    a.addEventListener('mouseenter', () => setFeatured(v));
+    a.dataset.segment = v.segment.toLowerCase();
+    return a;
+  });
+  cards.forEach((c) => grid.append(c));
+
+  tabs.forEach((label, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'hh-tab';
+    btn.textContent = label;
+    if (i === 0) btn.classList.add('is-active');
+    btn.addEventListener('click', () => {
+      tabRow.querySelectorAll('.hh-tab').forEach((t) => t.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      // "Todos (...)" and "Lançamento (...)" are not plain segments; match by prefix.
+      const key = label.split('(')[0].trim().toLowerCase();
+      cards.forEach((c) => {
+        let show = true;
+        if (key === 'todos') show = true;
+        else show = c.dataset.segment === key;
+        c.style.display = show ? '' : 'none';
       });
     });
+    tabRow.append(btn);
+  });
+
+  // Grid sits inside a carousel-like viewport wrapper (mirrors the source's
+  // scrollable card rail), giving the panel its third right-rail region.
+  const gridViewport = document.createElement('div');
+  gridViewport.className = 'hh-vehicle-viewport';
+  gridViewport.append(grid);
+
+  right.append(tabRow, gridViewport);
+  panel.append(featured, right);
+  return panel;
+}
+
+/**
+ * Simple all-menu grid panel used by the hamburger: icon cards + text links.
+ * Reuses the standard cards+links builder.
+ */
+function buildAllMenuPanel(submenu) {
+  const panel = buildCardsAndLinksPanel(submenu);
+  panel.classList.add('hh-panel-allmenu');
+  return panel;
+}
+
+/** Close every open panel/drawer and return the header to its transparent state. */
+function closeAll(header) {
+  header.querySelectorAll('.hh-item.is-open, .hh-hamburger.is-open, .hh-hamburger-panel.is-open')
+    .forEach((el) => el.classList.remove('is-open'));
+  header.querySelectorAll('.hh-trigger[aria-expanded="true"]')
+    .forEach((t) => t.setAttribute('aria-expanded', 'false'));
+  header.classList.remove('is-open', 'is-menu-open');
+  const ham = header.querySelector('.hh-hamburger');
+  if (ham) ham.setAttribute('aria-expanded', 'false');
+  document.body.style.overflowY = '';
+}
+
+export default async function decorate(block) {
+  const doc = await fetchNav();
+  block.textContent = '';
+  if (!doc) return;
+
+  const sections = [...doc.body.children];
+  // sections: [0]=logo, [1]=main nav <ul>, [2]=Ofertas CTA, [3]=hamburger all-menu <ul>
+  const logoSection = sections[0];
+  const navSection = sections[1];
+  const ctaSection = sections[2];
+  const allMenuSection = sections[3];
+
+  const header = document.createElement('div');
+  header.className = 'hh';
+
+  const bar = document.createElement('div');
+  bar.className = 'hh-bar';
+
+  // Hamburger
+  const hamburger = document.createElement('button');
+  hamburger.type = 'button';
+  hamburger.className = 'hh-hamburger';
+  hamburger.setAttribute('aria-label', 'Abrir menu');
+  hamburger.setAttribute('aria-expanded', 'false');
+  hamburger.innerHTML = '<span></span><span></span><span></span>';
+
+  // Logo
+  const logoLink = logoSection ? logoSection.querySelector('a') : null;
+  const brand = document.createElement('a');
+  brand.className = 'hh-logo';
+  brand.href = logoLink ? logoLink.getAttribute('href') : '/';
+  const logoImg = logoLink ? logoLink.querySelector('img') : null;
+  if (logoImg) brand.append(logoImg.cloneNode(true));
+  brand.setAttribute('aria-label', 'Hyundai');
+
+  // Main nav (semantic <nav> > <ul class="hh-nav nav-list">)
+  const navEl = document.createElement('nav');
+  navEl.className = 'hh-nav-wrap';
+  navEl.setAttribute('aria-label', 'Principal');
+  const navList = document.createElement('ul');
+  navList.className = 'hh-nav nav-list';
+  navEl.append(navList);
+  const triggers = navSection ? [...navSection.querySelectorAll(':scope > ul > li')] : [];
+
+  triggers.forEach((li) => {
+    const { label, link, submenu } = readItem(li);
+    const item = document.createElement('li');
+    item.className = 'hh-item';
+
+    const trigger = document.createElement(link ? 'a' : 'button');
+    trigger.className = 'hh-trigger';
+    if (link) trigger.href = link.getAttribute('href');
+    else trigger.type = 'button';
+    trigger.textContent = label;
+
+    item.append(trigger);
+
+    if (submenu) {
+      item.classList.add('has-panel');
+      trigger.setAttribute('aria-haspopup', 'true');
+      trigger.setAttribute('aria-expanded', 'false');
+      let panel;
+      if (label === 'Veículos') panel = buildVehiclesPanel(submenu);
+      else if (label === 'Concessionárias') panel = buildDealerSearchPanel(li);
+      else panel = buildCardsAndLinksPanel(submenu);
+
+      // Mobile slide-in sub-panels get a back button + heading (hidden on desktop).
+      const back = document.createElement('button');
+      back.type = 'button';
+      back.className = 'hh-back';
+      back.innerHTML = `<span class="hh-back-arrow" aria-hidden="true"></span><span>${label}</span>`;
+      panel.prepend(back);
+
+      // panel is the trigger's direct next sibling (accordion/aria contract)
+      item.append(panel);
+
+      const openItem = () => {
+        // On desktop, close sibling panels first. On mobile, keep the drawer
+        // (is-menu-open) so the sub-panel slides in over the open drawer.
+        if (isDesktop.matches) {
+          closeAll(header);
+        } else {
+          header.querySelectorAll('.hh-item.is-open').forEach((el) => {
+            if (el !== item) el.classList.remove('is-open');
+          });
+        }
+        item.classList.add('is-open');
+        trigger.setAttribute('aria-expanded', 'true');
+        header.classList.add('is-open');
+      };
+      const closeItem = () => {
+        item.classList.remove('is-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        if (!header.querySelector('.hh-item.is-open, .hh-hamburger.is-open') && isDesktop.matches) {
+          header.classList.remove('is-open');
+        }
+      };
+      // Desktop: hover opens; mouseout closes.
+      item.addEventListener('mouseenter', () => { if (isDesktop.matches) openItem(); });
+      item.addEventListener('mouseleave', () => { if (isDesktop.matches) closeItem(); });
+      // keyboard focus opens (desktop)
+      trigger.addEventListener('focus', () => { if (isDesktop.matches) openItem(); });
+      // Click: on mobile ALWAYS open the slide-in panel (even link-triggers);
+      // on desktop, only button-triggers open (link-triggers navigate).
+      trigger.addEventListener('click', (e) => {
+        if (!isDesktop.matches) { e.preventDefault(); openItem(); return; }
+        if (!link) { e.preventDefault(); openItem(); }
+      });
+      // Back button (mobile) closes just this sub-panel.
+      back.addEventListener('click', (e) => { e.stopPropagation(); closeItem(); });
+    }
+    navList.append(item);
+  });
+
+  // CTA (Ofertas) — rendered as the last nav item, styled as a filled cyan button,
+  // matching the source where Ofertas is the final item of the header menu.
+  const ctaLink = ctaSection ? ctaSection.querySelector('a') : null;
+  const ctaItem = document.createElement('li');
+  ctaItem.className = 'hh-item hh-item-cta';
+  const cta = document.createElement('a');
+  cta.className = 'hh-trigger hh-cta';
+  if (ctaLink) { cta.href = ctaLink.getAttribute('href'); cta.textContent = ctaLink.textContent.trim(); }
+  ctaItem.append(cta);
+  navList.append(ctaItem);
+
+  // Hamburger all-menu panel
+  let allMenuPanel = null;
+  const allMenuUl = allMenuSection ? allMenuSection.querySelector(':scope > ul') : null;
+  if (allMenuUl) {
+    allMenuPanel = buildAllMenuPanel(allMenuUl);
+    hamburger.classList.add('has-panel');
   }
 
-  // hamburger for mobile
-  const hamburger = document.createElement('div');
-  hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
-      <span class="nav-hamburger-icon"></span>
-    </button>`;
-  hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
-  nav.prepend(hamburger);
-  nav.setAttribute('aria-expanded', 'false');
-  // prevent mobile nav behavior on window resize
-  toggleMenu(nav, navSections, isDesktop.matches);
-  isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+  hamburger.addEventListener('click', () => {
+    if (isDesktop.matches) {
+      // Desktop: hamburger opens the all-menu dropdown panel.
+      const open = hamburger.classList.contains('is-open');
+      closeAll(header);
+      if (!open) {
+        hamburger.classList.add('is-open');
+        header.classList.add('is-open');
+        if (allMenuPanel) allMenuPanel.classList.add('is-open');
+        hamburger.setAttribute('aria-expanded', 'true');
+      }
+      return;
+    }
+    // Mobile: hamburger toggles the full-screen drawer.
+    const open = header.classList.contains('is-menu-open');
+    closeAll(header);
+    if (!open) {
+      hamburger.classList.add('is-open');
+      header.classList.add('is-menu-open', 'is-open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflowY = 'hidden';
+    } else {
+      document.body.style.overflowY = '';
+    }
+  });
 
-  const navWrapper = document.createElement('div');
-  navWrapper.className = 'nav-wrapper';
-  navWrapper.append(nav);
-  block.append(navWrapper);
+  bar.append(hamburger, brand, navEl);
+  header.append(bar);
+  if (allMenuPanel) {
+    allMenuPanel.classList.add('hh-hamburger-panel');
+    // On mobile the all-menu content lives inside the drawer (after the nav list);
+    // on desktop it is the hamburger dropdown. It sits inside the nav wrapper so
+    // the mobile drawer scrolls it together with the nav list.
+    navEl.append(allMenuPanel);
+  }
+  block.append(header);
+
+  // Close on outside click / escape
+  document.addEventListener('click', (e) => {
+    if (!header.contains(e.target)) closeAll(header);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') closeAll(header);
+  });
+
+  // Viewport resize handling: reset state when crossing breakpoints.
+  const onChange = () => {
+    closeAll(header);
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflowY = '';
+  };
+  isDesktop.addEventListener('change', onChange);
 }
