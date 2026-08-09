@@ -18,41 +18,112 @@ async function fetchNav() {
 }
 
 /**
- * Split an <li>'s content into its own label/link (direct children) and its
- * nested submenu <ul> (if any). Ignores content inside the nested <ul>.
+ * The nested submenu <ul> of an <li>, if any.
  * @param {HTMLLIElement} li
- * @returns {{label: string, link: HTMLAnchorElement|null, submenu: HTMLUListElement|null}}
+ * @returns {HTMLUListElement|null}
  */
-function readItem(li) {
-  const submenu = li.querySelector(':scope > ul');
-  const link = li.querySelector(':scope > a');
-  let label = '';
-  li.childNodes.forEach((node) => {
-    if (node.nodeType === Node.TEXT_NODE) label += node.textContent;
-    else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'A') label += node.textContent;
-  });
-  label = label.trim();
-  if (!label && link) label = link.textContent.trim();
-  return { label, link, submenu };
+function submenuOf(li) {
+  return li.querySelector(':scope > ul');
 }
 
 /**
- * Build a card link (icon/thumbnail above a label) from an <li> whose <a> holds an image.
+ * The primary link of an <li>, tolerant of the wrapping EDS/DA applies.
+ * Raw (localhost): `<li><a>…</a>`. Decorated (EDS): `<li><p><a>…</a></p>`.
+ * @param {HTMLLIElement} li
+ * @returns {HTMLAnchorElement|null}
+ */
+function linkOf(li) {
+  return li.querySelector(':scope > a, :scope > p > a');
+}
+
+/**
+ * The first image inside an <li>'s own content (not inside its nested <ul>).
+ * Works whether the image is under an <a>, a <picture>, or bare.
+ * @param {HTMLLIElement} li
+ * @returns {HTMLImageElement|null}
+ */
+function imageOf(li) {
+  const img = li.querySelector(':scope img, :scope > p img, :scope > a img');
+  if (!img) return null;
+  // Ignore images that live inside the nested submenu <ul>.
+  const nested = submenuOf(li);
+  if (nested && nested.contains(img)) return null;
+  return img;
+}
+
+/**
+ * Human label of an <li>, ignoring its nested submenu <ul> and any image alt.
+ * Handles EDS splitting the label into a sibling <p> after the image anchor.
+ * @param {HTMLLIElement} li
+ * @returns {string}
+ */
+function labelOf(li) {
+  const clone = li.cloneNode(true);
+  clone.querySelectorAll('ul, picture, img, source').forEach((el) => el.remove());
+  return clone.textContent.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Leading label of an <li> for a top-level nav trigger: the primary link's text,
+ * or the first text node / first <p> — NOT any following heading/placeholder copy
+ * (e.g. the Concessionárias panel's "Busque uma concessionária" heading).
+ * @param {HTMLLIElement} li
+ * @returns {string}
+ */
+function triggerLabelOf(li) {
+  const link = linkOf(li);
+  if (link) {
+    const t = labelOf(link);
+    if (t) return t;
+  }
+  // Walk direct children up to (but not including) the submenu <ul>; return the
+  // first non-empty text/<p>/<span>/<a> label.
+  const nodes = [...li.childNodes];
+  const stop = nodes.findIndex((n) => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'UL');
+  const scan = stop >= 0 ? nodes.slice(0, stop) : nodes;
+  const found = scan
+    .map((node) => {
+      if (node.nodeType === Node.TEXT_NODE) return node.textContent.replace(/\s+/g, ' ').trim();
+      if (node.nodeType === Node.ELEMENT_NODE && ['P', 'SPAN', 'A'].includes(node.tagName)) {
+        return labelOf(node);
+      }
+      return '';
+    })
+    .find((t) => t);
+  return found || labelOf(li);
+}
+
+/**
+ * Read an <li> into {label, link, submenu, image} regardless of raw vs decorated markup.
+ * @param {HTMLLIElement} li
+ */
+function readItem(li) {
+  return {
+    label: labelOf(li),
+    link: linkOf(li),
+    submenu: submenuOf(li),
+    image: imageOf(li),
+  };
+}
+
+/** True if this <li> represents a card (has an icon/thumbnail image). */
+function isCard(li) {
+  return !!imageOf(li);
+}
+
+/**
+ * Build a card link (icon/thumbnail above a label).
  * @param {HTMLLIElement} li
  * @returns {HTMLAnchorElement}
  */
 function buildCard(li) {
-  const { link } = readItem(li);
+  const { label, link, image } = readItem(li);
   const a = document.createElement('a');
   a.className = 'hh-card';
   a.href = link ? link.getAttribute('href') : '#';
-  const img = link ? link.querySelector('img') : null;
-  if (img) {
-    const fresh = img.cloneNode(true);
-    a.append(fresh);
-  }
+  if (image) a.append(image.cloneNode(true));
   const span = document.createElement('span');
-  span.textContent = readItem(li).label;
+  span.textContent = label;
   a.append(span);
   return a;
 }
@@ -69,7 +140,7 @@ function buildTextLink(li) {
 
 /**
  * Standard "icon cards + text-link column" panel.
- * Cards = <li>s whose <a> contains an <img>; text links = the remaining <li>s.
+ * Cards = <li>s that contain an image; text links = the remaining <li>s.
  * @param {HTMLUListElement} submenu
  * @returns {HTMLElement}
  */
@@ -81,8 +152,7 @@ function buildCardsAndLinksPanel(submenu) {
   const linksWrap = document.createElement('div');
   linksWrap.className = 'hh-links';
   [...submenu.children].forEach((li) => {
-    const { link } = readItem(li);
-    if (link && link.querySelector('img')) cardsWrap.append(buildCard(li));
+    if (isCard(li)) cardsWrap.append(buildCard(li));
     else linksWrap.append(buildTextLink(li));
   });
   if (cardsWrap.children.length) panel.append(cardsWrap);
@@ -106,6 +176,11 @@ function buildDealerSearchPanel(triggerLi) {
   if (cardsUl) [...cardsUl.children].forEach((li) => cardsWrap.append(buildCard(li)));
   panel.append(cardsWrap);
 
+  // The placeholder is the text-only <p> (EDS also wraps the trigger link in a
+  // <p>, so pick the one without an anchor/image).
+  const placeholder = [...triggerLi.querySelectorAll(':scope > p')]
+    .find((p) => !p.querySelector('a, img, picture'));
+
   // Right-side column wrapper (a div, so the search block is a countable region).
   const formCol = document.createElement('div');
   formCol.className = 'hh-dealer-col';
@@ -114,7 +189,7 @@ function buildDealerSearchPanel(triggerLi) {
   form.className = 'hh-dealer-form';
   form.addEventListener('submit', (e) => e.preventDefault());
 
-  const heading = triggerLi.querySelector(':scope > h3');
+  const heading = triggerLi.querySelector(':scope > h3, :scope > h2, :scope > h4');
   if (heading) {
     const h = document.createElement('p');
     h.className = 'hh-dealer-title';
@@ -144,7 +219,6 @@ function buildDealerSearchPanel(triggerLi) {
     form.append(opts);
   }
 
-  const placeholder = triggerLi.querySelector(':scope > p');
   const inputRow = document.createElement('div');
   inputRow.className = 'hh-dealer-input';
   const input = document.createElement('input');
@@ -176,12 +250,12 @@ function buildVehiclesPanel(submenu) {
   const tabs = [];
   const vehicles = [];
   [...submenu.children].forEach((li) => {
-    const nested = li.querySelector(':scope > ul');
-    const link = li.querySelector(':scope > a');
+    const nested = submenuOf(li);
+    const link = linkOf(li);
     if (link && nested) {
       // Specs are alternating <li> nodes: label, value, label, value, …
       // plus a trailing "Segmento: <x>" line used only for tab filtering.
-      const rawSpecs = [...nested.children].map((s) => s.textContent.trim());
+      const rawSpecs = [...nested.children].map((s) => s.textContent.replace(/\s+/g, ' ').trim());
       let segment = '';
       const flat = rawSpecs.filter((s) => {
         if (s.toLowerCase().startsWith('segmento:')) { segment = s.split(':')[1].trim(); return false; }
@@ -192,14 +266,14 @@ function buildVehiclesPanel(submenu) {
         specPairs.push({ label: flat[i] || '', value: flat[i + 1] || '' });
       }
       vehicles.push({
-        label: readItem(li).label,
+        label: labelOf(li),
         href: link.getAttribute('href'),
-        img: link.querySelector('img'),
+        img: imageOf(li),
         specs: specPairs,
         segment,
       });
     } else if (!link) {
-      tabs.push(readItem(li).label);
+      tabs.push(labelOf(li));
     }
   });
 
@@ -355,7 +429,8 @@ export default async function decorate(block) {
   const triggers = navSection ? [...navSection.querySelectorAll(':scope > ul > li')] : [];
 
   triggers.forEach((li) => {
-    const { label, link, submenu } = readItem(li);
+    const { link, submenu } = readItem(li);
+    const label = triggerLabelOf(li);
     const item = document.createElement('li');
     item.className = 'hh-item';
 
