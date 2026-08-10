@@ -10,18 +10,20 @@
  * governing permissions and limitations under the License.
  */
 
+@import url('brand.css');
+
 :root {
-  /* colors */
-  --background-color: white;
+  /* colors — Hyundai Brazil brand (see brand.css) */
+  --background-color: #fff;
   --light-color: #f8f8f8;
   --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+  --text-color: rgb(33 37 41);
+  --link-color: #002c5f;
+  --link-hover-color: #00aad2;
 
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  /* fonts — Hyundai proprietary type falls back to Lato (as on the source) */
+  --body-font-family: lato, lato-fallback, sans-serif;
+  --heading-font-family: lato, lato-fallback, sans-serif;
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -40,16 +42,10 @@
   --nav-height: 64px;
 }
 
-/* fallback fonts */
+/* fallback font — matches Lato metrics until the webfont loads */
 @font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
-  src: local('Arial');
-}
-
-@font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
+  font-family: lato-fallback;
+  size-adjust: 97.5%;
   src: local('Arial');
 }
 

@@ -1,3 +1,15 @@
+/* Hyundai Brazil hero carousel — full-bleed banner slides matching the source */
+
+/* break the hero out of the section's max-width/padding so it spans edge-to-edge */
+.carousel-hero-wrapper {
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+.carousel-hero {
+  position: relative;
+}
+
 .carousel-hero .carousel-hero-slides-container {
   position: relative;
 }
@@ -23,131 +35,148 @@
 .carousel-hero .carousel-hero-slide {
   flex: 0 0 100%;
   scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
   position: relative;
   width: 100%;
-  min-height: min(50vw, calc(100dvh - var(--header-height)));
+  aspect-ratio: 375 / 536; /* full-bleed banner; ~2.4:1 (1440x600) on desktop */
+  overflow: hidden;
 }
 
-.carousel-hero .carousel-hero-slide:has(.carousel-hero-slide-content[data-align='center']) {
-  align-items: center;
-}
-
-.carousel-hero .carousel-hero-slide:has(.carousel-hero-slide-content[data-align='right']) {
-  align-items: flex-end;
-}
-
+/* slide media fills the whole slide (image or video); object-fit cover */
+/* stylelint-disable-next-line no-descending-specificity */
+.carousel-hero .carousel-hero-slide .carousel-hero-slide-image,
 .carousel-hero .carousel-hero-slide .carousel-hero-slide-image picture {
   position: absolute;
   inset: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
 }
 
-.carousel-hero .carousel-hero-slide .carousel-hero-slide-image picture > img {
+.carousel-hero .carousel-hero-slide .carousel-hero-slide-image img,
+.carousel-hero .carousel-hero-slide .carousel-hero-slide-image video {
+  display: block;
   height: 100%;
   width: 100%;
   object-fit: cover;
 }
 
+/* optional overlay text (empty on this page, but supported) */
 .carousel-hero .carousel-hero-slide .carousel-hero-slide-content {
+  position: absolute;
+  inset: 0;
   z-index: 1;
-  margin: 68px;
-  padding: 16px;
-  color: white;
-  background-color: rgb(19 19 19 / 75%);
-  position: relative;
-  width: var(--slide-content-width, auto);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: #fff;
+  pointer-events: none;
 }
 
+.carousel-hero .carousel-hero-slide .carousel-hero-slide-content a {
+  pointer-events: auto;
+}
+
+/* pagination dots — white, active = Hyundai blue, centered near the bottom */
 .carousel-hero .carousel-hero-slide-indicators {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px 12px;
-  padding: 12px;
-  background-color: var(--light-color);
+  gap: 8px;
+  padding: 0;
   line-height: 0;
+  background: none;
 }
 
 .carousel-hero .carousel-hero-slide-indicator button {
-  width: 24px;
-  height: 24px;
+  width: 9px;
+  height: 9px;
   margin: 0;
   padding: 0;
+  border: 0;
   border-radius: 50%;
-  background-color: #dadada;
-  transition: background-color 0.2s;
+  background-color: #fff;
+  opacity: 0.9;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
 }
 
 .carousel-hero .carousel-hero-slide-indicator button:disabled,
 .carousel-hero .carousel-hero-slide-indicator button:hover,
 .carousel-hero .carousel-hero-slide-indicator button:focus-visible {
-  background-color: var(--text-color);
+  background-color: var(--hyundai-blue, #002c5f);
+  opacity: 1;
 }
 
+/* prev/next arrows — minimal chevrons inset from the edges, vertically centered */
 .carousel-hero .carousel-hero-navigation-buttons {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  left: 12px;
-  right: 12px;
+  left: 16px;
+  right: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 1;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
 .carousel-hero .carousel-hero-navigation-buttons button {
   position: relative;
-  width: 44px;
+  width: 32px;
   height: 44px;
   margin: 0;
-  border-radius: 50%;
   padding: 0;
-  background-color: rgb(19 19 19 / 25%);
-  transition: background-color 0.2s;
-}
-
-.carousel-hero .carousel-hero-navigation-buttons button:hover,
-.carousel-hero .carousel-hero-navigation-buttons button:focus-visible {
-  background-color: rgb(19 19 19 / 75%);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .carousel-hero .carousel-hero-navigation-buttons button::after {
   display: block;
   content: '';
-  border: 2px solid;
-  border-bottom: 0;
-  border-left: 0;
-  height: 12px;
-  width: 12px;
   position: absolute;
   top: 50%;
-  left: calc(50% + 2px);
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border: solid #fff;
+  border-width: 3px 3px 0 0;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 35%));
   transform: translate(-50%, -50%) rotate(-135deg);
 }
 
 .carousel-hero .carousel-hero-navigation-buttons button.slide-next::after {
   transform: translate(-50%, -50%) rotate(45deg);
-  left: calc(50% - 2px);
 }
 
-@media (width >= 600px) {
+@media (width >= 900px) {
+  .carousel-hero .carousel-hero-slide {
+    aspect-ratio: 1440 / 605;
+  }
+
+  .carousel-hero .carousel-hero-slide-indicators {
+    bottom: 20px;
+    gap: 8px;
+  }
+
   .carousel-hero .carousel-hero-navigation-buttons {
-    left: 24px;
-    right: 24px;
+    left: 90px;
+    right: 90px;
   }
 
   .carousel-hero .carousel-hero-slide .carousel-hero-slide-content {
-    --slide-content-width: calc((100% - 184px) / 2);
-
-    margin: 92px;
-  }
-
-  .carousel-hero .carousel-hero-slide .carousel-hero-slide-content[data-align='justify'] {
-    --slide-content-width: auto;
+    padding: 90px;
   }
 }

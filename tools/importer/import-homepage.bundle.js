@@ -54,7 +54,9 @@ var CustomImportScript = (() => {
       const picture = slide.querySelector("picture");
       const img = slide.querySelector("img");
       const video = slide.querySelector("video.hc-video-desktop") || slide.querySelector("video");
+      const label = slideLink && slideLink.getAttribute("aria-label") || img && img.getAttribute("alt") || "Slide";
       let mediaCell = null;
+      const textCell = [];
       if (picture || img) {
         const media = picture || img;
         if (href) {
@@ -66,17 +68,22 @@ var CustomImportScript = (() => {
           mediaCell = media;
         }
       } else if (video) {
+        const vsrc = video.getAttribute("src") || video.querySelector("source") && video.querySelector("source").getAttribute("src");
+        if (vsrc) {
+          const va = document.createElement("a");
+          va.setAttribute("href", vsrc);
+          va.textContent = label;
+          mediaCell = va;
+        }
         if (href) {
-          const a = document.createElement("a");
-          a.setAttribute("href", href);
-          a.append(video);
-          mediaCell = a;
-        } else {
-          mediaCell = video;
+          const la = document.createElement("a");
+          la.setAttribute("href", href);
+          la.textContent = label;
+          textCell.push(la);
+          hasText = true;
         }
       }
       if (!mediaCell) return;
-      const textCell = [];
       const titleContent = slide.querySelector(".hc-title-content, .hc-texts-container");
       if (titleContent && titleContent.textContent.trim()) {
         Array.from(titleContent.childNodes).forEach((node) => {
@@ -84,8 +91,8 @@ var CustomImportScript = (() => {
             textCell.push(node);
           }
         });
+        hasText = true;
       }
-      if (textCell.length) hasText = true;
       rows.push({ mediaCell, textCell });
     });
     if (!rows.length) {
@@ -282,9 +289,16 @@ var CustomImportScript = (() => {
         // HandTalk accessibility widget (cleaned.html:2048)
         "#destination_publishing_iframe_hyundaibrasil_0",
         // Adobe ID-sync tracking iframe (cleaned.html:1762)
-        'img[src*="ib.adnxs.com"]'
+        'img[src*="ib.adnxs.com"]',
         // AppNexus tracking pixel (cleaned.html:1766)
+        "noscript"
+        // <noscript> fallbacks (not content)
       ]);
+      element.querySelectorAll("p").forEach((p) => {
+        if (/enable JavaScript to run this app/i.test(p.textContent || "")) {
+          p.remove();
+        }
+      });
     }
     if (hookName === TransformHook.afterTransform) {
       WebImporter.DOMUtils.remove(element, [

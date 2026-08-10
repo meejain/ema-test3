@@ -37,8 +37,15 @@ export default function parse(element, { document }) {
     const video = slide.querySelector('video.hc-video-desktop')
       || slide.querySelector('video');
 
+    const label = (slideLink && slideLink.getAttribute('aria-label'))
+      || (img && img.getAttribute('alt'))
+      || 'Slide';
+
     let mediaCell = null;
+    const textCell = [];
+
     if (picture || img) {
+      // Image slide: keep the media wrapped in the landing link (markdown-safe).
       const media = picture || img;
       if (href) {
         const a = document.createElement('a');
@@ -49,22 +56,30 @@ export default function parse(element, { document }) {
         mediaCell = media;
       }
     } else if (video) {
-      // Linked video: wrap the video element in the slide's landing link so both
-      // the video source and the destination are preserved.
+      // Video slide: <video> can't survive html2md, so emit a markdown-safe LINK
+      // to the video file (the block turns .mp4 links into autoplaying <video>),
+      // and carry the landing destination as a second-column link. Both links have
+      // visible label text so markdown keeps them as [text](url).
+      const vsrc = video.getAttribute('src')
+        || (video.querySelector('source') && video.querySelector('source').getAttribute('src'));
+      if (vsrc) {
+        const va = document.createElement('a');
+        va.setAttribute('href', vsrc);
+        va.textContent = label;
+        mediaCell = va;
+      }
       if (href) {
-        const a = document.createElement('a');
-        a.setAttribute('href', href);
-        a.append(video);
-        mediaCell = a;
-      } else {
-        mediaCell = video;
+        const la = document.createElement('a');
+        la.setAttribute('href', href);
+        la.textContent = label;
+        textCell.push(la);
+        hasText = true;
       }
     }
 
     if (!mediaCell) return; // slide with no media — skip gracefully
 
     // Optional overlay text (title / description / CTA). Empty on this page.
-    const textCell = [];
     const titleContent = slide.querySelector('.hc-title-content, .hc-texts-container');
     if (titleContent && titleContent.textContent.trim()) {
       Array.from(titleContent.childNodes).forEach((node) => {
@@ -72,8 +87,8 @@ export default function parse(element, { document }) {
           textCell.push(node);
         }
       });
+      hasText = true;
     }
-    if (textCell.length) hasText = true;
 
     rows.push({ mediaCell, textCell });
   });

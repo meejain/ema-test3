@@ -1,0 +1,17 @@
+/* Hyundai Brazil brand tokens — extracted from https://www.hyundai.com.br/ */
+:root {
+  /* fonts — source uses proprietary HyundaiSans*, which falls back to Lato (loaded on the source) */
+  --heading-font-family: lato, lato-fallback, sans-serif;
+  --body-font-family: lato, lato-fallback, sans-serif;
+
+  /* colors */
+  --background-color: #fff;
+  --text-color: rgb(33 37 41);
+  --link-color: #002c5f;
+  --link-hover-color: #00aad2;
+
+  /* brand accents */
+  --hyundai-blue: #002c5f;
+  --hyundai-active-blue: #00aad2;
+  --hyundai-black: #111;
+}

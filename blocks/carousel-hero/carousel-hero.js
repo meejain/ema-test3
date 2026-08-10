@@ -68,6 +68,29 @@ function bindEvents(block) {
   });
 }
 
+// Convert a link that points at a video file into an autoplaying, muted,
+// looping background <video> (matches the source's full-bleed video slides).
+const SOURCE_ORIGIN = 'https://www.hyundai.com.br';
+
+function videoFromLink(link) {
+  let src = link.getAttribute('href');
+  // Imported DAM video paths are relative (/content/dam/...); they live on the
+  // source domain (like the imported images), so absolutize them.
+  if (src && src.startsWith('/')) src = SOURCE_ORIGIN + src;
+  const video = document.createElement('video');
+  video.setAttribute('autoplay', '');
+  video.setAttribute('loop', '');
+  video.setAttribute('muted', '');
+  video.setAttribute('playsinline', '');
+  video.setAttribute('preload', 'auto');
+  video.muted = true;
+  const source = document.createElement('source');
+  source.setAttribute('src', src);
+  source.setAttribute('type', 'video/mp4');
+  video.append(source);
+  return video;
+}
+
 function createSlide(row, slideIndex, carouselId) {
   const slide = document.createElement('li');
   slide.dataset.slideIndex = slideIndex;
@@ -78,6 +101,37 @@ function createSlide(row, slideIndex, carouselId) {
     column.classList.add(`carousel-hero-slide-${colIdx === 0 ? 'image' : 'content'}`);
     slide.append(column);
   });
+
+  const imageCol = slide.querySelector('.carousel-hero-slide-image');
+  const contentCol = slide.querySelector('.carousel-hero-slide-content');
+
+  // Resolve the slide's landing destination. Image slides carry the link around
+  // the picture; video slides carry a placeholder video-file link in the image
+  // cell and the real destination as a link in the content cell.
+  let landingHref = null;
+  const contentLink = contentCol && contentCol.querySelector('a[href]');
+
+  // Video slide: the image cell holds a link to an .mp4 (no <img>).
+  const videoLink = imageCol && imageCol.querySelector('a[href$=".mp4"], a[href*=".mp4"]');
+  if (videoLink && !imageCol.querySelector('img, picture')) {
+    const video = videoFromLink(videoLink);
+    imageCol.textContent = '';
+    imageCol.append(video);
+    landingHref = contentLink ? contentLink.getAttribute('href') : null;
+    // The content cell only carries the placeholder landing link (no real overlay
+    // text on this page). Keep it only if it has a heading or non-placeholder copy;
+    // otherwise drop it so no "Slide" label shows over the video.
+    const hasRealOverlay = contentCol
+      && contentCol.querySelector('h1, h2, h3, h4, h5, h6, picture, img');
+    if (contentCol && !hasRealOverlay) contentCol.remove();
+  } else {
+    // Image slide: destination is the link wrapping the picture.
+    const imgLink = imageCol && imageCol.querySelector('a[href]');
+    landingHref = imgLink ? imgLink.getAttribute('href') : null;
+  }
+
+  // Make the whole slide clickable when there's no visible text/CTA overlay.
+  if (landingHref) slide.dataset.href = landingHref;
 
   const labeledBy = slide.querySelector('h1, h2, h3, h4, h5, h6');
   if (labeledBy) {
@@ -125,6 +179,14 @@ export default async function decorate(block) {
 
   rows.forEach((row, idx) => {
     const slide = createSlide(row, idx, carouselId);
+    // whole-slide click navigation (source slides are fully clickable banners)
+    if (slide.dataset.href) {
+      slide.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        window.location.href = slide.dataset.href;
+      });
+      slide.style.cursor = 'pointer';
+    }
     slidesWrapper.append(slide);
 
     if (slideIndicators) {

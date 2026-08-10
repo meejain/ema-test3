@@ -26,7 +26,16 @@ export default function transform(hookName, element, payload) {
       '.ht-skip',                               // HandTalk accessibility widget (cleaned.html:2048)
       '#destination_publishing_iframe_hyundaibrasil_0', // Adobe ID-sync tracking iframe (cleaned.html:1762)
       'img[src*="ib.adnxs.com"]',               // AppNexus tracking pixel (cleaned.html:1766)
+      'noscript',                               // <noscript> fallbacks (not content)
     ]);
+
+    // React SPA no-JS fallback text ("You need to enable JavaScript to run
+    // this app.") — a leftover <p> at the app root, not authorable content.
+    element.querySelectorAll('p').forEach((p) => {
+      if (/enable JavaScript to run this app/i.test(p.textContent || '')) {
+        p.remove();
+      }
+    });
   }
 
   if (hookName === TransformHook.afterTransform) {
