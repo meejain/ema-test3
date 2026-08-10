@@ -347,10 +347,13 @@ header nav .nav-vehicle-tabs button.is-active {
   font-weight: 700;
 }
 
+/* Mobile (base): the Veículos panel is a single-column list of LARGE vehicle
+   images (name below) — matching the source mobile menu. The featured hero and
+   category tabs are desktop-only and hidden here (re-shown in the desktop @media). */
 header nav .nav-vehicle-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px 16px;
+  grid-template-columns: 1fr;
+  gap: 8px 0;
 }
 
 header nav .nav-vehicle-card {
@@ -358,6 +361,7 @@ header nav .nav-vehicle-card {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  padding: 12px 0;
   text-decoration: none;
   color: var(--nav-text-dark);
   font-size: 14px;
@@ -366,7 +370,6 @@ header nav .nav-vehicle-card {
 
 header nav .nav-vehicle-thumb {
   width: 100%;
-  min-height: 96px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -374,12 +377,17 @@ header nav .nav-vehicle-thumb {
 
 header nav .nav-vehicle-card img {
   width: 100%;
-  max-width: 180px;
+  max-width: 100%;
   height: auto;
   object-fit: contain;
 }
 
 header nav .nav-vehicle-card[hidden] {
+  display: none;
+}
+
+header nav .nav-featured,
+header nav .nav-vehicle-tabs {
   display: none;
 }
 
@@ -607,7 +615,20 @@ header nav .nav-panel-back-arrow {
   }
 
   header nav .nav-featured {
+    display: flex;
     flex: 0 0 46%;
+  }
+
+  header nav .nav-vehicle-tabs {
+    display: flex;
+  }
+
+  header nav .nav-vehicle-card {
+    padding: 0;
+  }
+
+  header nav .nav-vehicle-thumb {
+    min-height: 96px;
   }
 
   header nav .nav-vehicles-right {

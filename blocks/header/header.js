@@ -391,9 +391,13 @@ function buildTopNav(nav, mainUl) {
       item.addEventListener('mouseleave', () => {
         if (isDesktop.matches) item.classList.remove('is-open');
       });
-      trigger.addEventListener('click', () => {
-        // Mobile: open the slide-in sub-panel (main drawer slides away via CSS).
-        if (!isDesktop.matches) item.classList.add('is-open');
+      trigger.addEventListener('click', (e) => {
+        // Mobile: a panel item is a toggle, never a link — open the slide-in
+        // sub-panel and suppress navigation even when the trigger has an href.
+        if (!isDesktop.matches) {
+          e.preventDefault();
+          item.classList.add('is-open');
+        }
       });
     }
     list.append(item);
