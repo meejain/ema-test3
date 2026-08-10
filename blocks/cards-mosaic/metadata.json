@@ -1,0 +1,37 @@
+{
+  "variantName": "cards-mosaic",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-08-09T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.hyundai.com.br/",
+    "originPage": "Hyundai Brazil homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "wide",
+    "purpose": "promo-mosaic",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "linked image tiles of varying aspect ratios; text baked into artwork",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "asymmetric promotional image-tile mosaics",
+      "grids of linked image tiles where copy is baked into the artwork",
+      "campaign/vehicle promo tile grids (used by rc4 and rc8)"
+    ],
+    "notSuitableFor": [
+      "cards with separate title/description/price text (use cards-vehicle or cards-offer)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/index"],
+    "reuseCount": 2,
+    "lastUsed": "2026-08-09T00:00:00.000Z"
+  }
+}

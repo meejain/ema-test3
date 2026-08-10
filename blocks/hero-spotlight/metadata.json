@@ -1,0 +1,37 @@
+{
+  "variantName": "hero-spotlight",
+  "baseBlock": "hero",
+  "version": "1.0.0",
+  "created": "2026-08-09T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.hyundai.com.br/",
+    "originPage": "Hyundai Brazil homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "spacious",
+    "purpose": "vehicle-spotlight",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "background image + optional heading/subheading + single CTA",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "full-bleed single-vehicle or product spotlights",
+      "static promotional banners with a background asset and one CTA"
+    ],
+    "notSuitableFor": [
+      "rotating multi-slide promos (use carousel-hero)",
+      "side-by-side image + text layouts (use columns variants)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/index"],
+    "reuseCount": 1,
+    "lastUsed": "2026-08-09T00:00:00.000Z"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "variantName": "cards-vehicle",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-08-09T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.hyundai.com.br/",
+    "originPage": "Hyundai Brazil homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "wide",
+    "purpose": "vehicle-showroom",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "vehicle image + model name + 'A partir de' price + CTA",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "vehicle/product showroom card sliders",
+      "repeating product cards with image + title + price + CTA"
+    ],
+    "notSuitableFor": [
+      "offer cards with promotional conditions (use cards-offer)",
+      "image-only mosaic tiles (use cards-mosaic)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/index"],
+    "reuseCount": 1,
+    "lastUsed": "2026-08-09T00:00:00.000Z"
+  }
+}

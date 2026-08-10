@@ -1,0 +1,33 @@
+.columns-linkhub > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.columns-linkhub img {
+  width: 100%;
+}
+
+.columns-linkhub > div > div {
+  order: 1;
+}
+
+.columns-linkhub > div > .columns-linkhub-img-col {
+  order: 0;
+}
+
+.columns-linkhub > div > .columns-linkhub-img-col img {
+  display: block;
+}
+
+@media (width >= 900px) {
+  .columns-linkhub > div {
+    align-items: center;
+    flex-direction: unset;
+    gap: 24px;
+  }
+
+  .columns-linkhub > div > div {
+    flex: 1;
+    order: unset;
+  }
+}

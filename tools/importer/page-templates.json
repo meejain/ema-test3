@@ -1,0 +1,146 @@
+{
+  "metadata": {
+    "projectType": "da"
+  },
+  "templates": [
+    {
+      "name": "homepage",
+      "urls": [
+        "https://www.hyundai.com.br/"
+      ],
+      "coverageGaps": [],
+      "description": "Hyundai Brazil homepage: hero carousel, full-video vehicle spotlight, vehicle showroom slider, mosaic promo grids, offer slider, CTA banner, and a link hub. Header and footer are experience fragments handled separately.",
+      "blocks": [
+        {
+          "name": "carousel-hero",
+          "instances": [
+            "#hyunda_carousel"
+          ]
+        },
+        {
+          "name": "hero-spotlight",
+          "instances": [
+            ".full-video-page"
+          ]
+        },
+        {
+          "name": "cards-vehicle",
+          "instances": [
+            ".vehicle-showroom"
+          ]
+        },
+        {
+          "name": "cards-mosaic",
+          "instances": [
+            ".mosaic"
+          ]
+        },
+        {
+          "name": "cards-offer",
+          "instances": [
+            ".offers-slider"
+          ]
+        },
+        {
+          "name": "columns-cta",
+          "instances": [
+            ".call-page"
+          ]
+        },
+        {
+          "name": "columns-linkhub",
+          "instances": [
+            ".link-hub"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "rc1",
+          "name": "hero-carousel",
+          "selector": "#hyunda_carousel",
+          "style": null,
+          "blocks": [
+            "carousel-hero"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc2",
+          "name": "kona-spotlight",
+          "selector": ".full-video-page",
+          "style": null,
+          "blocks": [
+            "hero-spotlight"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc3",
+          "name": "vehicle-showroom",
+          "selector": ".vehicle-showroom",
+          "style": null,
+          "blocks": [
+            "cards-vehicle"
+          ],
+          "defaultContent": [
+            "h1.vs-title"
+          ]
+        },
+        {
+          "id": "rc4",
+          "name": "mosaic-grid-1",
+          "selector": ".mosaic",
+          "style": null,
+          "blocks": [
+            "cards-mosaic"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc5",
+          "name": "offer-slider",
+          "selector": ".offers-slider",
+          "style": null,
+          "blocks": [
+            "cards-offer"
+          ],
+          "defaultContent": [
+            ".os-texts-home-title",
+            ".os-texts-home-text"
+          ]
+        },
+        {
+          "id": "rc6",
+          "name": "cta-banner",
+          "selector": ".call-page",
+          "style": null,
+          "blocks": [
+            "columns-cta"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc7",
+          "name": "link-hub",
+          "selector": ".link-hub",
+          "style": null,
+          "blocks": [
+            "columns-linkhub"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc8",
+          "name": "mosaic-grid-2",
+          "selector": ".mosaic",
+          "style": null,
+          "blocks": [
+            "cards-mosaic"
+          ],
+          "defaultContent": []
+        }
+      ]
+    }
+  ]
+}

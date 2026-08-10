@@ -1,20 +1,398 @@
+/* Hyundai Brazil footer — mobile-first. Black band, white text. */
+
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  background-color: #000;
+  color: #fff;
+  font-size: 14px;
 }
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
-}
-
-footer .footer p {
+footer .footer-inner {
   margin: 0;
 }
 
+/* hidden parity block (source responsive-duplicate legal links + logos) */
+footer .footer-parity {
+  display: none;
+}
+
+footer p {
+  margin: 0;
+}
+
+footer a {
+  color: #fff;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: #00aad2;
+}
+
+/* CTA (Monte seu carro) */
+footer .footer-cta {
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+  background: #000;
+}
+
+footer .footer-cta-button {
+  display: inline-block;
+  padding: 12px 32px;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+footer .footer-cta-button:hover {
+  background: #fff;
+  color: #002c5f;
+}
+
+/* promo image band */
+footer .footer-promo {
+  line-height: 0;
+}
+
+footer .footer-promo img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* main black footer */
+footer .footer-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  box-sizing: border-box;
+}
+
+/* signup form */
+footer .footer-signup {
+  margin-bottom: 40px;
+}
+
+footer .footer-signup h4 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+footer .footer-signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+footer .footer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+footer .footer-field span {
+  font-size: 12px;
+  color: #ccc;
+}
+
+footer .footer-field input {
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid #555;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+}
+
+footer .footer-field input:focus {
+  outline: none;
+  border-bottom-color: #00aad2;
+}
+
+footer .footer-channels-intro {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+footer .footer-channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+footer .footer-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+footer .footer-checkbox input {
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+footer .footer-consents {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 12px;
+  color: #ccc;
+}
+
+footer .footer-submit {
+  align-self: flex-start;
+  padding: 12px 40px;
+  border: 0;
+  border-radius: 4px;
+  background: #002c5f;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+footer .footer-submit:hover {
+  background: #00aad2;
+}
+
+footer .footer-disclaimer {
+  margin-top: 16px;
+  font-size: 11px;
+  color: #999;
+}
+
+/* link menu */
+footer .footer-linkmenu {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px 0;
+  border-top: 1px solid #333;
+}
+
+footer .footer-col h4 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* mobile accordion toggle */
+footer .footer-col-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 0;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid #333;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+footer .footer-col-toggle::after {
+  content: '+';
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+footer .footer-col.open .footer-col-toggle::after {
+  content: '−';
+}
+
+footer .footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+
+footer .footer-col.open ul {
+  display: flex;
+  padding: 12px 0;
+}
+
+/* columns without a toggle (e.g. the A Hyundai list) stay visible on mobile */
+footer .footer-col:not(:has(.footer-col-toggle)) ul {
+  display: flex;
+}
+
+footer .footer-col ul a {
+  font-size: 13px;
+  color: #ccc;
+}
+
+footer .footer-col ul a:hover {
+  color: #fff;
+}
+
+/* bottom bar */
+footer .footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 32px 0;
+  border-top: 1px solid #333;
+}
+
+footer .footer-bottom-brand img {
+  width: 140px;
+  height: auto;
+  margin-bottom: 12px;
+}
+
+footer .footer-bottom-brand p {
+  font-size: 12px;
+  color: #ccc;
+  margin-bottom: 12px;
+}
+
+footer .footer-legal {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+/* stylelint-disable no-descending-specificity */
+footer .footer-legal a,
+footer .footer-manage-cookies {
+  font-size: 12px;
+  color: #ccc;
+}
+/* stylelint-enable no-descending-specificity */
+
+footer .footer-manage-cookies {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* stylelint-disable no-descending-specificity */
+footer .footer-legal a:hover,
+footer .footer-manage-cookies:hover {
+  color: #fff;
+}
+/* stylelint-enable no-descending-specificity */
+
+footer .footer-bottom-contact p {
+  font-size: 12px;
+  color: #ccc;
+  margin-bottom: 4px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+footer .footer-bottom-social ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 16px;
+}
+
+footer .footer-bottom-social img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+footer .footer-bottom-social a:hover img {
+  opacity: 0.7;
+  transform: scale(1.1);
+}
+
+/* proconve notice */
+footer .footer-proconve {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0 0;
+  border-top: 1px solid #333;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+footer .footer-proconve img {
+  width: 64px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+footer .footer-proconve p {
+  font-size: 11px;
+  color: #999;
+}
+
+/* ---- desktop ---- */
 @media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  footer .footer-main {
+    padding: 48px 24px;
+  }
+
+  footer .footer-linkmenu {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 32px;
+  }
+
+  /* desktop: toggle renders as a static heading, all lists open */
+  footer .footer-col-toggle {
+    padding: 0 0 12px;
+    border-bottom: 0;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  footer .footer-col-toggle::after {
+    content: '';
+  }
+
+  footer .footer-col ul,
+  footer .footer-col.open ul {
+    display: flex;
+    padding: 0;
+  }
+
+  /* heading link duplicates the desktop h4 — hide it on desktop only */
+  footer .footer-col-headlink {
+    display: none;
+  }
+
+  footer .footer-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: start;
+    gap: 32px;
+  }
+
+  footer .footer-signup-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 32px;
+  }
+
+  footer .footer-channels-intro,
+  footer .footer-channels,
+  footer .footer-consents,
+  footer .footer-submit {
+    grid-column: 1 / -1;
   }
 }

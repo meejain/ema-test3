@@ -1,0 +1,11 @@
+{
+  "type": "da",
+  "sites": {
+    "ema-test3": {
+      "previewOrg": "meejain",
+      "previewSite": "ema-test3",
+      "contentHostUrl": "https://content.da.live/meejain/ema-test3/",
+      "libraryUrl": "https://main--sta-boilerplate--aemdemos.aem.page/tools/sidekick/library.json"
+    }
+  }
+}

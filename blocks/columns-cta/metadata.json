@@ -1,0 +1,37 @@
+{
+  "variantName": "columns-cta",
+  "baseBlock": "columns",
+  "version": "1.0.0",
+  "created": "2026-08-09T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.hyundai.com.br/",
+    "originPage": "Hyundai Brazil homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "cta-banner",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "image column | heading + subheading + CTA column",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "horizontal CTA banners with an image beside heading + CTA",
+      "two-column promo call-outs"
+    ],
+    "notSuitableFor": [
+      "text-over-background hero banners (use hero-spotlight)",
+      "link-list + image hubs (use columns-linkhub)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/index"],
+    "reuseCount": 1,
+    "lastUsed": "2026-08-09T00:00:00.000Z"
+  }
+}

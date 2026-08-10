@@ -1,0 +1,37 @@
+{
+  "variantName": "cards-offer",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-08-09T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.hyundai.com.br/",
+    "originPage": "Hyundai Brazil homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "wide",
+    "purpose": "offers",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "vehicle image + model name + price/condition + CTA",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "offer/deal card sliders",
+      "repeating cards with image + title + price condition + CTA to an offer page"
+    ],
+    "notSuitableFor": [
+      "generic vehicle showroom cards (use cards-vehicle)",
+      "image-only mosaic tiles (use cards-mosaic)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/index"],
+    "reuseCount": 1,
+    "lastUsed": "2026-08-09T00:00:00.000Z"
+  }
+}
