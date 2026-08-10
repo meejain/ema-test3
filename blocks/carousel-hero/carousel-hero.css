@@ -1,0 +1,154 @@
+/*
+ * carousel-hero
+ * Full-bleed homepage hero slider matching the source site's top carousel.
+ * The carousel is flush with the very top of the page (touches the top) and
+ * spans the full viewport width; the header floats over it.
+ */
+
+/*
+ * Full-bleed: the carousel shares its section with other blocks, so we only
+ * break the carousel's own wrapper out of the centered, padded container.
+ * Higher specificity than `main > .section > div { max-width: 1200px }`.
+ */
+main > .section > .carousel-hero-wrapper {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* pull the first section flush to the very top, header floats over it */
+main > .section.carousel-hero-container:first-of-type {
+  margin-top: calc(-1 * var(--nav-height));
+}
+
+.carousel-hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+
+  /* portrait media on mobile (420x600), matching source */
+  aspect-ratio: 420 / 600;
+  max-height: 100vh;
+  background-color: #f3f3f3;
+}
+
+.carousel-hero-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+  will-change: transform;
+}
+
+.carousel-hero-slide {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-hero-slide a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-hero-slide picture,
+.carousel-hero-slide video,
+.carousel-hero-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* pagination bullets, centered near the bottom (source: bottom 20px) */
+.carousel-hero-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.carousel-hero-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 55%);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.carousel-hero-dots button[aria-selected='true'] {
+  background: #fff;
+  transform: scale(1.15);
+}
+
+/* prev / next arrows */
+.carousel-hero-prev,
+.carousel-hero-next {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: none;
+  width: 44px;
+  height: 44px;
+  transform: translateY(-50%);
+  border: none;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 25%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.carousel-hero-prev::before,
+.carousel-hero-next::before {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: auto;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+}
+
+.carousel-hero-prev {
+  left: 16px;
+}
+
+.carousel-hero-prev::before {
+  transform: rotate(-135deg);
+  margin-left: 18px;
+}
+
+.carousel-hero-next {
+  right: 16px;
+}
+
+.carousel-hero-next::before {
+  transform: rotate(45deg);
+  margin-right: 18px;
+}
+
+@media (width >= 768px) {
+  .carousel-hero {
+    /* landscape media on desktop (1920x800), matching source */
+    aspect-ratio: 1920 / 800;
+  }
+
+  .carousel-hero-prev,
+  .carousel-hero-next {
+    display: block;
+  }
+
+  .carousel-hero-dots {
+    bottom: 20px;
+  }
+}
