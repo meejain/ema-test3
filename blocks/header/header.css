@@ -1,272 +1,669 @@
-/* header and nav layout */
-header .nav-wrapper {
-  background-color: var(--background-color);
+/* ==========================================================================
+   Hyundai-style header — transparent over hero, solid white when a panel opens.
+   Mobile-first: base styles are the mobile drawer; the min-width media query
+   at the end enhances desktop (horizontal bar + hover dropdowns).
+   ========================================================================== */
+
+:root {
+  --nav-height: 60px;
+  --nav-cta-bg: #00aad2;
+  --nav-brand: #002c5f;
+  --nav-text-light: #fff;
+  --nav-text-dark: #000;
+  --nav-panel-bg: #fff;
+  --nav-card-bg: #f4f2ee;
+  --nav-underline: #00aad2;
+}
+
+/* The header is transparent by default and overlaps the hero (fixed). */
+header .nav-wrapper,
+header .header.block {
+  background-color: transparent;
   width: 100%;
-  z-index: 2;
+  z-index: 9999;
   position: fixed;
+  top: 0;
+  left: 0;
+  padding: 0;
 }
 
-header nav {
+header nav#nav {
   box-sizing: border-box;
-  display: grid;
-  grid-template:
-    'hamburger brand tools' var(--nav-height)
-    'sections sections sections' 1fr / auto 1fr auto;
+  width: 100%;
+  background: linear-gradient(rgb(0 0 0 / 20%), rgb(0 0 0 / 0%));
+  font-family: var(--body-font-family, sans-serif);
+  position: relative;
+}
+
+header nav .nav-container {
+  display: flex;
   align-items: center;
-  gap: 0 24px;
-  margin: auto;
-  max-width: 1248px;
-  height: var(--nav-height);
-  padding: 0 24px;
-  font-family: var(--body-font-family);
+  gap: 12px;
+  min-height: var(--nav-height);
+  padding: 0 16px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-header nav[aria-expanded='true'] {
-  grid-template:
-    'hamburger brand' var(--nav-height)
-    'sections sections' 1fr
-    'tools tools' var(--nav-height) / auto 1fr;
-  overflow-y: auto;
-  min-height: 100dvh;
+/* ------- Left cluster: hamburger + divider + logo ------- */
+header nav .nav-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-@media (width >= 900px) {
-  header .nav-wrapper {
-    position: relative;
-  }
-
-  header nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 0 32px;
-    max-width: 1264px;
-    padding: 0 32px;
-  }
-
-  header nav[aria-expanded='true'] {
-    min-height: 0;
-    overflow: visible;
-  }
-}
-
-header nav p {
-  margin: 0;
-  line-height: 1;
-}
-
-header nav a:any-link {
-  color: currentcolor;
-}
-
-/* hamburger */
 header nav .nav-hamburger {
-  grid-area: hamburger;
-  height: 22px;
+  width: 35px;
+  height: 35px;
+  padding: 6px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+header nav .nav-hamburger span {
+  display: block;
+  height: 2px;
+  width: 22px;
+  background: var(--nav-text-light);
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.2s ease;
+  transform-origin: center;
+}
+
+header nav .nav-divider {
+  width: 1px;
+  height: 24px;
+  background: currentcolor;
+  opacity: 0.5;
+}
+
+header nav .nav-logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--nav-text-light);
+}
+
+header nav .nav-logo img {
+  height: 18px;
+  width: auto;
+  display: block;
+}
+
+/* ------- Main nav list: mobile drawer (hidden until hamburger opens) ------- */
+header nav .nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none;
+}
+
+header nav .nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+}
+
+header nav .nav-item-trigger {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 20px;
+  color: var(--nav-text-dark);
+  font-family: var(--heading-font-family, var(--body-font-family, sans-serif));
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+/* ------- Ofertas CTA ------- */
+header nav .nav-cta {
+  display: inline-flex;
+  align-items: center;
+  height: var(--nav-height);
+  padding: 0 16px;
+  margin-left: auto;
+  background: var(--nav-cta-bg);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Panels — hidden by default; icon-card + link column layout.
+   ========================================================================== */
+header nav .nav-panel,
+header nav .nav-brand-panel {
+  display: none;
+}
+
+header nav .nav-panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 20px 20px;
+  align-items: flex-start;
+}
+
+header nav .nav-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+header nav .nav-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+  padding: 18px;
+  background: var(--nav-card-bg);
+  color: var(--nav-text-dark);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+header nav .nav-card:hover {
+  background: #e9e6e0;
+}
+
+header nav .nav-card-icon {
+  display: flex;
+  justify-content: flex-end;
+}
+
+header nav .nav-card-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+header nav .nav-card-label {
+  font-size: 15px;
+}
+
+header nav .nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-content: start;
+}
+
+header nav .nav-link {
+  color: var(--nav-text-dark);
+  text-decoration: none;
+  font-size: 15px;
+  padding: 6px 0;
+}
+
+header nav .nav-link:hover {
+  color: var(--nav-brand);
+}
+
+/* ------- Dealer search (Concessionárias) ------- */
+header nav .nav-dealer-search {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 280px;
+}
+
+header nav .nav-dealer-title {
+  font-weight: 700;
+  color: var(--nav-text-dark);
+}
+
+header nav .nav-dealer-options {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+header nav .nav-dealer-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--nav-text-dark);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+header nav .nav-dealer-form {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #999;
+  background: var(--nav-card-bg);
+}
+
+header nav .nav-dealer-form input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--nav-text-dark);
+}
+
+header nav .nav-dealer-form button {
+  border: 0;
+  background: var(--nav-brand);
+  color: #fff;
+  padding: 0 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ------- Vehicle megamenu: featured detail + selectable grid ------- */
+header nav .nav-featured {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-decoration: none;
+  color: var(--nav-text-dark);
+}
+
+header nav .nav-featured-name {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+header nav .nav-featured-image {
+  min-height: 140px;
   display: flex;
   align-items: center;
 }
 
-header nav .nav-hamburger button {
-  height: 22px;
-  margin: 0;
+header nav .nav-featured-image img {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  object-fit: contain;
+}
+
+header nav .nav-featured-specs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+header nav .nav-featured-spec {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+header nav .nav-featured-spec .spec-title {
+  font-size: 12px;
+  color: #666;
+}
+
+header nav .nav-featured-spec .spec-value {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+header nav .nav-vehicles-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  width: 100%;
+}
+
+header nav .nav-vehicle-tabs {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+header nav .nav-vehicle-tabs button {
+  background: none;
   border: 0;
-  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  padding: 4px 2px;
+  font-size: 14px;
+  color: var(--nav-text-dark);
+  cursor: pointer;
+  text-transform: none;
+}
+
+header nav .nav-vehicle-tabs button.is-active {
+  border-bottom-color: var(--nav-underline);
+  font-weight: 700;
+}
+
+header nav .nav-vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 16px;
+}
+
+header nav .nav-vehicle-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--nav-text-dark);
+  font-size: 14px;
+  text-align: center;
+}
+
+header nav .nav-vehicle-thumb {
+  width: 100%;
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+header nav .nav-vehicle-card img {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+header nav .nav-vehicle-card[hidden] {
+  display: none;
+}
+
+/* ==========================================================================
+   MOBILE open states (drawer). Base viewport is mobile.
+   ========================================================================== */
+header nav.is-open {
+  background: var(--nav-panel-bg);
+}
+
+header nav.is-open .nav-logo {
+  color: var(--nav-text-dark);
+}
+
+header nav.is-open .nav-hamburger span {
+  background: var(--nav-text-dark);
+}
+
+header nav.is-open .nav-hamburger span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+header nav.is-open .nav-hamburger span:nth-child(2) {
+  opacity: 0;
+}
+
+header nav.is-open .nav-hamburger span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile drawer: the whole container becomes a fixed full-height scroll column.
+   The left cluster (hamburger + logo) stays as the top bar; the CTA, nav list
+   and brand panel stack and scroll below it. */
+header nav.is-open .nav-container {
+  position: fixed;
+  inset: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
   padding: 0;
-  background-color: var(--background-color);
-  color: inherit;
-  overflow: initial;
-  text-overflow: initial;
-  white-space: initial;
+  max-width: none;
+  background: var(--nav-panel-bg);
+  overflow-y: auto;
+  z-index: 9999;
 }
 
-header nav .nav-hamburger-icon,
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  box-sizing: border-box;
+header nav.is-open .nav-left {
+  min-height: var(--nav-height);
+  padding: 0 16px;
+  flex: 0 0 auto;
+}
+
+header nav.is-open .nav-cta {
+  order: 1;
+  width: 100%;
+  justify-content: flex-start;
+  flex: 0 0 auto;
+}
+
+header nav.is-open .nav-list {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
+header nav.is-open .nav-brand-panel {
+  order: 3;
+  flex: 0 0 auto;
   display: block;
-  position: relative;
-  width: 20px;
+  background: var(--nav-panel-bg);
 }
 
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  content: '';
-  position: absolute;
-  background: currentcolor;
+header nav.is-open .nav-brand-panel .nav-panel-inner {
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 20px 40px;
 }
 
-header nav[aria-expanded='false'] .nav-hamburger-icon,
-header nav[aria-expanded='false'] .nav-hamburger-icon::before,
-header nav[aria-expanded='false'] .nav-hamburger-icon::after {
-  height: 2px;
-  border-radius: 2px;
-  background: currentcolor;
+/* Nav item rows: full-width flush, chevron on the right. */
+header nav.is-open .nav-item {
+  position: static;
 }
 
-header nav[aria-expanded='false'] .nav-hamburger-icon::before {
-  top: -6px;
+/* Reorder: Veículos first on mobile (source shows it at the top of the nav list). */
+header nav.is-open .nav-list .nav-item:nth-child(3) {
+  order: -1;
 }
 
-header nav[aria-expanded='false'] .nav-hamburger-icon::after {
-  top: 6px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon {
-  height: 22px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon::before,
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: 3px;
-  left: 1px;
-  transform: rotate(45deg);
-  transform-origin: 2px 1px;
-  width: 24px;
-  height: 2px;
-  border-radius: 2px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: unset;
-  bottom: 3px;
+header nav.is-open .nav-item.has-panel > .nav-item-trigger::after {
+  content: "";
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
   transform: rotate(-45deg);
 }
 
-@media (width >= 900px) {
-  header nav .nav-hamburger {
-    display: none;
-    visibility: hidden;
-  }
-}
-
-/* brand */
-header .nav-brand {
-  grid-area: brand;
-  flex-basis: 128px;
-  font-size: var(--heading-font-size-s);
-  font-weight: 700;
-  line-height: 1;
-}
-
-header nav .nav-brand img {
-  width: 128px;
-  height: auto;
-}
-
-/* sections */
-header nav .nav-sections {
-  grid-area: sections;
-  flex: 1 1 auto;
-  display: none;
+/* Slide-in sub-panel: fixed full-screen, off-canvas by default, slides in when open. */
+header nav.is-open .nav-item .nav-panel {
+  display: block;
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  width: 100%;
+  height: calc(100vh - var(--nav-height));
+  background: var(--nav-panel-bg);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  z-index: 2;
   visibility: hidden;
 }
 
-header nav[aria-expanded='true'] .nav-sections {
-  display: block;
+header nav .nav-item.is-open .nav-panel {
+  transform: translateX(0);
   visibility: visible;
-  align-self: start;
 }
 
-header nav .nav-sections ul {
-  list-style: none;
-  padding-left: 0;
-  font-size: var(--body-font-size-s);
+/* Back button at the top of each mobile sub-panel. */
+header nav .nav-panel-back {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-bottom: 1px solid #eee;
+  background: none;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--nav-text-dark);
+  cursor: pointer;
 }
 
-header nav .nav-sections ul > li {
-  font-weight: 500;
+header nav .nav-panel-back-arrow {
+  width: 9px;
+  height: 9px;
+  border-left: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: rotate(45deg);
 }
 
-header nav .nav-sections ul > li > ul {
-  margin-top: 0;
-}
 
-header nav .nav-sections ul > li > ul > li {
-  font-weight: 400;
-}
-
+/* ==========================================================================
+   DESKTOP (width >= 900px) — horizontal bar, hover dropdowns, solid-on-open.
+   ========================================================================== */
 @media (width >= 900px) {
-  header nav .nav-sections {
-    display: block;
-    visibility: visible;
-    white-space: nowrap;
+  header nav .nav-container {
+    padding: 0;
+    justify-content: space-between;
+    gap: 16px;
   }
 
-  header nav[aria-expanded='true'] .nav-sections {
-    align-self: unset;
-  }
-
-  header nav .nav-sections .nav-drop {
-    position: relative;
-    padding-right: 16px;
-    cursor: pointer;
-  }
-
-  header nav .nav-sections .nav-drop::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    top: 0.5em;
-    right: 2px;
-    transform: rotate(135deg);
-    width: 6px;
-    height: 6px;
-    border: 2px solid currentcolor;
-    border-radius: 0 1px 0 0;
-    border-width: 2px 2px 0 0;
-  }
-
-  header nav .nav-sections .nav-drop[aria-expanded='true']::after {
-    top: unset;
-    bottom: 0.5em;
-    transform: rotate(315deg);
-  }
-
-  header nav .nav-sections ul {
+  header nav .nav-list {
     display: flex;
-    gap: 24px;
-    margin: 0;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li {
-    flex: 0 1 auto;
-    position: relative;
+  header nav .nav-item {
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+    border-bottom: 0;
+    order: 0;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul {
+  /* Desktop: no back button, no mobile chevron, reset slide-in transform. */
+  header nav .nav-panel-back {
     display: none;
-    position: relative;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
+  header nav .nav-item.has-panel > .nav-item-trigger::after {
+    content: none;
+  }
+
+  header nav .nav-item.is-open .nav-panel {
+    transform: none;
+    visibility: visible;
+    position: absolute;
+    height: auto;
+  }
+
+  header nav .nav-item-trigger {
+    height: var(--nav-height);
+    padding: 0 20px;
+    color: var(--nav-text-light);
+  }
+
+  header nav .nav-cta {
+    height: var(--nav-height);
+    padding: 0 24px;
+  }
+
+  /* Panels: full-width, absolutely positioned below the 60px bar. Content is
+     centered in a max-width band and distributed edge-to-edge (cards left,
+     links right) to mirror the source's wide layout. */
+  header nav .nav-panel-inner {
+    flex-direction: row;
+    gap: 48px;
+    padding: 40px 24px 60px;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  header nav .nav-cards {
+    grid-template-columns: repeat(2, minmax(180px, 220px));
+    width: auto;
+  }
+
+  header nav .nav-links {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(4, auto);
+    gap: 12px 48px;
+    min-width: 320px;
+    min-height: 100px;
+    margin-right: 6%;
+  }
+
+  header nav .nav-featured {
+    flex: 0 0 46%;
+  }
+
+  header nav .nav-vehicles-right {
+    align-items: flex-end;
+  }
+
+  header nav .nav-item.is-open .nav-vehicle-grid {
+    width: 100%;
+    max-width: 640px;
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+
+  header nav .nav-featured-name {
+    font-size: 28px;
+  }
+
+  header nav .nav-featured-image {
+    min-height: 180px;
+  }
+
+  header nav .nav-featured-specs {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  header nav .nav-item.is-open .nav-item-trigger {
+    border-bottom-color: var(--nav-underline);
+  }
+
+  header nav .nav-item.has-panel.is-open > .nav-panel {
     display: block;
     position: absolute;
-    left: -24px;
-    width: 200px;
-    top: 150%;
-    padding: 16px;
-    background-color: var(--light-color);
-    white-space: initial;
+    top: var(--nav-height);
+    left: 0;
+    width: 100%;
+    background: var(--nav-panel-bg);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 12%);
+    animation: none;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 16px;
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid var(--light-color);
+  header nav.is-open .nav-brand-panel {
+    box-shadow: 0 8px 16px rgb(0 0 0 / 12%);
+    animation: none;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
-    padding: 8px 0;
+  /* When ANY panel is open the header bar turns solid white + text inverts. */
+  header nav:has(.nav-item.is-open) {
+    background: var(--nav-panel-bg);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
   }
-}
 
-/* tools */
-header nav .nav-tools {
-  grid-area: tools;
+  header nav:has(.nav-item.is-open) .nav-item-trigger,
+  header nav:has(.nav-item.is-open) .nav-logo {
+    color: var(--nav-text-dark);
+  }
+
+  header nav:has(.nav-item.is-open) .nav-hamburger span {
+    background: var(--nav-text-dark);
+  }
 }
