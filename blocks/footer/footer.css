@@ -1,20 +1,304 @@
+/* Hyundai Motor Brasil footer — black body, promo image band with overlaid CTA,
+   newsletter form, multi-column link grid, and bottom bar.
+   Mobile-first: base styles target small screens; min-width media queries enhance. */
+
+:root {
+  --hmb-blue: #002c5f;
+  --hmb-footer-bg: #000;
+}
+
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  background-color: var(--hmb-footer-bg);
+  color: #fff;
+  font-size: 14px;
+  font-family: var(--body-font-family);
 }
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
-}
-
-footer .footer p {
+footer .footer-inner {
   margin: 0;
 }
 
+footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* --- Promo band + CTA --- */
+footer .footer-promo {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+footer .footer-promo-bg {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+footer .footer-cta {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 28px;
+  background: var(--hmb-blue);
+  color: #fff;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+footer .footer-cta:hover {
+  text-decoration: none;
+  filter: brightness(1.1);
+}
+
+/* --- Newsletter form --- */
+footer .footer-newsletter {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 20px 24px;
+}
+
+footer .footer-newsletter h4 {
+  margin: 0 0 24px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+footer .footer-form-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+footer .footer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+footer .footer-field span {
+  font-size: 12px;
+  color: #ccc;
+}
+
+footer .footer-field input {
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid #555;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 14px;
+}
+
+footer .footer-form-legend {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+footer .footer-channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 24px;
+}
+
+footer .footer-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+footer .footer-checkbox input {
+  margin-top: 2px;
+  accent-color: #009cd8;
+}
+
+footer .footer-consents {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+footer .footer-consents .footer-checkbox {
+  font-size: 12px;
+  color: #ccc;
+}
+
+footer .footer-submit {
+  padding: 12px 40px;
+  border: 0;
+  background: var(--hmb-blue);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+footer .footer-submit:hover {
+  filter: brightness(1.1);
+}
+
+footer .footer-disclaimer {
+  max-width: 1300px;
+  margin: 24px auto 0;
+  padding: 0 20px;
+  font-size: 12px;
+  color: #999;
+}
+
+/* --- Link grid --- */
+footer .footer-links {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+footer .footer-col h5 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+footer .footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+footer .footer-col a {
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
+/* --- Bottom bar --- */
+footer .footer-bottom {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+footer .footer-bottom-logo img {
+  height: 28px;
+  width: auto;
+}
+
+footer .footer-copyright {
+  margin: 12px 0;
+  font-size: 12px;
+  color: #ccc;
+}
+
+footer .footer-legal {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+footer .footer-legal a {
+  font-size: 13px;
+  color: #e0e0e0;
+}
+
+footer .footer-bottom-contact p {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+footer .footer-social {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+footer .footer-social a {
+  display: inline-flex;
+}
+
+footer .footer-social img {
+  width: 22px;
+  height: 22px;
+}
+
+footer .footer-proconve {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: #fff;
+  color: #333;
+}
+
+footer .footer-proconve img {
+  flex: 0 0 auto;
+  width: 56px;
+  height: auto;
+}
+
+footer .footer-proconve span {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* ============ Tablet ============ */
+@media (width >= 600px) {
+  footer .footer-form-fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  footer .footer-links {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============ Desktop ============ */
 @media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  footer .footer-newsletter,
+  footer .footer-disclaimer {
+    padding-left: 70px;
+    padding-right: 70px;
+  }
+
+  footer .footer-form-fields {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  footer .footer-channels {
+    gap: 16px 32px;
+  }
+
+  footer .footer-links {
+    grid-template-columns: repeat(6, 1fr);
+    padding: 40px 70px;
+  }
+
+  footer .footer-bottom {
+    grid-template-columns: 1.4fr 1fr 1fr;
+    padding: 24px 70px 60px;
   }
 }
