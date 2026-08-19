@@ -1,272 +1,529 @@
-/* header and nav layout */
+/* AbbVie-style header — mobile-first. Solid white bar, dark navy text.
+   Base styles target mobile (drawer); min-width media queries enhance desktop. */
+
+:root {
+  --nav-navy: rgb(7 29 73);
+  --nav-blue: rgb(7 30 200);
+  --nav-lavender: rgb(244 245 250);
+  --nav-hairline: rgb(224 227 235);
+  --nav-height: 64px;
+}
+
 header .nav-wrapper {
-  background-color: var(--background-color);
-  width: 100%;
-  z-index: 2;
-  position: fixed;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  border-bottom: 1px solid var(--nav-hairline);
 }
 
 header nav {
-  box-sizing: border-box;
   display: grid;
-  grid-template:
-    'hamburger brand tools' var(--nav-height)
-    'sections sections sections' 1fr / auto 1fr auto;
+  grid-template-areas: 'hamburger brand search';
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0 24px;
-  margin: auto;
-  max-width: 1248px;
-  height: var(--nav-height);
-  padding: 0 24px;
-  font-family: var(--body-font-family);
+  gap: 8px;
+  min-height: var(--nav-height);
+  padding: 0 16px;
+  font-family: roboto, helvetica, arial, sans-serif;
+  color: var(--nav-navy);
 }
 
-header nav[aria-expanded='true'] {
-  grid-template:
-    'hamburger brand' var(--nav-height)
-    'sections sections' 1fr
-    'tools tools' var(--nav-height) / auto 1fr;
-  overflow-y: auto;
-  min-height: 100dvh;
+/* Bar-level search (visible in the top bar at all breakpoints) */
+header nav .nav-search {
+  grid-area: search;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
-@media (width >= 900px) {
-  header .nav-wrapper {
-    position: relative;
-  }
-
-  header nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 0 32px;
-    max-width: 1264px;
-    padding: 0 32px;
-  }
-
-  header nav[aria-expanded='true'] {
-    min-height: 0;
-    overflow: visible;
-  }
-}
-
-header nav p {
+header nav .nav-search-list {
+  display: flex;
+  align-items: center;
   margin: 0;
-  line-height: 1;
+  padding: 0;
+  list-style: none;
 }
 
-header nav a:any-link {
-  color: currentcolor;
+header nav .nav-search .nav-item-search {
+  position: relative;
+  border-bottom: 0;
 }
 
-/* hamburger */
+/* the search panel drops full-width below the bar */
+header nav .nav-search .nav-panel-search {
+  position: fixed;
+  left: 0;
+  top: var(--nav-height);
+  width: 100%;
+  padding: 16px;
+  background: #fff;
+  border-top: 1px solid var(--nav-hairline);
+}
+
+header nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Brand */
+header nav .nav-brand {
+  grid-area: brand;
+  display: flex;
+  align-items: center;
+}
+
+header nav .nav-brand img {
+  display: block;
+  width: 96px;
+  height: auto;
+}
+
+/* Hamburger (mobile only) */
 header nav .nav-hamburger {
   grid-area: hamburger;
-  height: 22px;
   display: flex;
   align-items: center;
 }
 
 header nav .nav-hamburger button {
-  height: 22px;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   padding: 0;
-  background-color: var(--background-color);
-  color: inherit;
-  overflow: initial;
-  text-overflow: initial;
-  white-space: initial;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 header nav .nav-hamburger-icon,
 header nav .nav-hamburger-icon::before,
 header nav .nav-hamburger-icon::after {
-  box-sizing: border-box;
+  content: '';
   display: block;
   position: relative;
-  width: 20px;
+  width: 22px;
+  height: 2px;
+  background: var(--nav-navy);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  content: '';
+header nav .nav-hamburger-icon::before {
   position: absolute;
-  background: currentcolor;
+  top: -7px;
 }
 
-header nav[aria-expanded='false'] .nav-hamburger-icon,
-header nav[aria-expanded='false'] .nav-hamburger-icon::before,
-header nav[aria-expanded='false'] .nav-hamburger-icon::after {
-  height: 2px;
-  border-radius: 2px;
-  background: currentcolor;
+header nav .nav-hamburger-icon::after {
+  position: absolute;
+  top: 7px;
 }
 
-header nav[aria-expanded='false'] .nav-hamburger-icon::before {
-  top: -6px;
+/* Hamburger morphs to a cross when the drawer is open */
+header nav.nav-open .nav-hamburger-icon {
+  background: transparent;
 }
 
-header nav[aria-expanded='false'] .nav-hamburger-icon::after {
-  top: 6px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon {
-  height: 22px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon::before,
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: 3px;
-  left: 1px;
+header nav.nav-open .nav-hamburger-icon::before {
+  top: 0;
   transform: rotate(45deg);
-  transform-origin: 2px 1px;
-  width: 24px;
-  height: 2px;
-  border-radius: 2px;
 }
 
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: unset;
-  bottom: 3px;
+header nav.nav-open .nav-hamburger-icon::after {
+  top: 0;
   transform: rotate(-45deg);
 }
 
+/* Drawer — mobile full-height panel holding nav + tools (hidden until open) */
+header nav .nav-drawer {
+  display: none;
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  width: 100%;
+  height: calc(100vh - var(--nav-height));
+  overflow-y: auto;
+  background: #fff;
+  border-top: 1px solid var(--nav-hairline);
+}
+
+header nav.nav-open .nav-drawer {
+  display: block;
+}
+
+header nav .nav-tools {
+  display: block;
+}
+
+/* Nav lists */
+header nav .nav-list,
+header nav .nav-tools-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+header nav .nav-item {
+  position: relative;
+  border-bottom: 1px solid var(--nav-hairline);
+}
+
+header nav .nav-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 18px;
+  color: var(--nav-navy);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Panels — visibility driven by the trigger's aria-expanded state */
+header nav .nav-panel {
+  display: none;
+  padding: 0 16px 16px;
+  background: var(--nav-lavender);
+}
+
+header nav .nav-trigger[aria-expanded='true'] + .nav-panel {
+  display: block;
+}
+
+header nav .nav-panel ul {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+header nav .nav-group > a,
+header nav .nav-panel > ul > li > a {
+  display: inline-block;
+  padding: 10px 0;
+  font-size: 16px;
+}
+
+header nav .nav-panel ul ul {
+  padding-left: 16px;
+}
+
+header nav .nav-panel ul ul[hidden] {
+  display: none;
+}
+
+/* Group expand toggle (+ / −) */
+header nav .nav-group {
+  position: relative;
+}
+
+header nav .nav-group-toggle {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+header nav .nav-group-toggle::before,
+header nav .nav-group-toggle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  background: var(--nav-navy);
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease;
+}
+
+header nav .nav-group-toggle::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+header nav .nav-group-toggle[aria-expanded='true']::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+/* Mobile "Back" control at top of an expanded section */
+header nav .nav-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--nav-hairline);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--nav-navy);
+  cursor: pointer;
+}
+
+header nav .nav-back::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: var(--nav-navy);
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>') center / contain no-repeat;
+}
+
+/* Promo blocks inside panels */
+header nav .nav-panel h3,
+header nav .nav-panel h4,
+header nav .nav-panel h5 {
+  margin: 16px 0 8px;
+  color: var(--nav-navy);
+}
+
+header nav .nav-panel h3 {
+  font-size: 22px;
+}
+
+header nav .nav-panel img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+header nav .nav-panel p {
+  margin: 8px 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Promo band (mobile: stacked) */
+header nav .nav-panel .nav-promo-band {
+  margin-top: 8px;
+}
+
+header nav .nav-panel .nav-promo-col + .nav-promo-col {
+  margin-top: 16px;
+}
+
+/* Tool triggers — mobile: stacked full-width in the drawer */
+header nav .nav-item-tool {
+  border-bottom: 1px solid var(--nav-hairline);
+}
+
+header nav .nav-trigger-icon {
+  width: 44px;
+  justify-content: center;
+  padding: 12px;
+  font-size: 0;
+}
+
+header nav .nav-trigger-search::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  background: var(--nav-navy);
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14"/></svg>') center / contain no-repeat;
+}
+
+header nav .nav-panel-search .nav-search-form {
+  display: flex;
+  padding: 8px 0;
+}
+
+header nav .nav-search-form input {
+  flex: 1;
+  padding: 12px;
+  font: inherit;
+  font-size: 16px;
+  border: 1px solid var(--nav-hairline);
+  border-radius: 4px;
+}
+
+/* ===== Desktop (>= 900px): horizontal bar + full-width dropdown panels ===== */
 @media (width >= 900px) {
+  :root {
+    --nav-height: 88px;
+  }
+
+  header nav {
+    grid-template-areas: 'brand sections tools search';
+    grid-template-columns: auto 1fr auto auto;
+    gap: 24px;
+    padding: 0 55px;
+  }
+
+  header nav .nav-search {
+    grid-area: search;
+  }
+
   header nav .nav-hamburger {
     display: none;
-    visibility: hidden;
   }
-}
 
-/* brand */
-header .nav-brand {
-  grid-area: brand;
-  flex-basis: 128px;
-  font-size: var(--heading-font-size-s);
-  font-weight: 700;
-  line-height: 1;
-}
+  header nav .nav-brand img {
+    width: 110px;
+  }
 
-header nav .nav-brand img {
-  width: 128px;
-  height: auto;
-}
+  /* Drawer is transparent on desktop — primary & tools drop into the grid */
+  header nav .nav-drawer {
+    display: contents;
+  }
 
-/* sections */
-header nav .nav-sections {
-  grid-area: sections;
-  flex: 1 1 auto;
-  display: none;
-  visibility: hidden;
-}
-
-header nav[aria-expanded='true'] .nav-sections {
-  display: block;
-  visibility: visible;
-  align-self: start;
-}
-
-header nav .nav-sections ul {
-  list-style: none;
-  padding-left: 0;
-  font-size: var(--body-font-size-s);
-}
-
-header nav .nav-sections ul > li {
-  font-weight: 500;
-}
-
-header nav .nav-sections ul > li > ul {
-  margin-top: 0;
-}
-
-header nav .nav-sections ul > li > ul > li {
-  font-weight: 400;
-}
-
-@media (width >= 900px) {
   header nav .nav-sections {
-    display: block;
-    visibility: visible;
+    display: flex;
+    position: static;
+    width: auto;
+    max-height: none;
+    overflow: visible;
+    border-top: 0;
+    justify-content: center;
+  }
+
+  header nav .nav-tools {
+    grid-area: tools;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  header nav .nav-tools-list {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  header nav .nav-item-tool,
+  header nav .nav-item-search {
+    border-bottom: 0;
+  }
+
+  /* restore icon-only search on desktop */
+  header nav .nav-trigger-icon {
+    width: 44px;
+    justify-content: center;
+    padding: 12px;
+    font-size: 0;
+  }
+
+  header nav .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  header nav .nav-item {
+    border-bottom: 0;
+  }
+
+  header nav .nav-trigger {
+    width: auto;
+    padding: 0 16px;
+    height: var(--nav-height);
+    font-size: 18px;
     white-space: nowrap;
   }
 
-  header nav[aria-expanded='true'] .nav-sections {
-    align-self: unset;
+  header nav .nav-trigger[aria-expanded='true'] {
+    box-shadow: inset 0 -3px 0 0 var(--nav-navy);
   }
 
-  header nav .nav-sections .nav-drop {
-    position: relative;
-    padding-right: 16px;
-    cursor: pointer;
+  /* Panels drop full-width below the bar */
+  header nav .nav-panel {
+    position: fixed;
+    left: 0;
+    top: var(--nav-height);
+    width: 100vw;
+    padding: 40px 55px 0;
+    background: #fff;
+    border-top: 1px solid var(--nav-hairline);
+    box-shadow: 0 12px 24px rgb(0 0 0 / 8%);
+    animation: none;
   }
 
-  header nav .nav-sections .nav-drop::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    top: 0.5em;
-    right: 2px;
-    transform: rotate(135deg);
-    width: 6px;
-    height: 6px;
-    border: 2px solid currentcolor;
-    border-radius: 0 1px 0 0;
-    border-width: 2px 2px 0 0;
+  /* Top link grid: multi-column, sub-lists always visible on desktop */
+  header nav .nav-panel > ul:first-of-type {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 48px;
+    max-width: 1200px;
+    margin: 0 auto 24px;
   }
 
-  header nav .nav-sections .nav-drop[aria-expanded='true']::after {
-    top: unset;
-    bottom: 0.5em;
-    transform: rotate(315deg);
-  }
-
-  header nav .nav-sections ul {
-    display: flex;
-    gap: 24px;
-    margin: 0;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li {
-    flex: 0 1 auto;
-    position: relative;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li > ul {
-    display: none;
-    position: relative;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
-    display: block;
-    position: absolute;
-    left: -24px;
-    width: 200px;
-    top: 150%;
-    padding: 16px;
-    background-color: var(--light-color);
-    white-space: initial;
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li > ul::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 16px;
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid var(--light-color);
-  }
-
-  header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
+  header nav .nav-panel > ul:first-of-type > li {
     padding: 8px 0;
   }
+
+  header nav .nav-panel > ul:first-of-type ul {
+    padding-left: 0;
+  }
+
+  /* Back control is mobile-only */
+  header nav .nav-back {
+    display: none;
+  }
+
+  /* Match source: nested groups stay collapsed behind +/- toggles on desktop */
+  header nav .nav-panel .nav-group > a {
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  header nav .nav-panel .nav-group > ul a {
+    font-size: 15px;
+    color: rgb(60 70 100);
+  }
+
+  /* Bottom promo band: 3 columns (intro | featured | stat) on lavender */
+  header nav .nav-panel .nav-promo-band {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    padding: 32px 55px;
+    margin: 0 -55px;
+    background: var(--nav-lavender);
+  }
+
+  header nav .nav-panel .nav-promo-col {
+    min-width: 0;
+  }
+
+  /* Tools row */
+  header nav .nav-item-tool .nav-trigger,
+  header nav .nav-item-search .nav-trigger {
+    height: var(--nav-height);
+    padding: 0 12px;
+    font-size: 14px;
+    letter-spacing: 0.56px;
+    text-transform: uppercase;
+  }
+
+  header nav .nav-item-tool .nav-panel,
+  header nav .nav-item-search .nav-panel {
+    padding: 32px 55px;
+  }
+
+  /* stylelint-disable no-descending-specificity */
+  header nav .nav-item-tool .nav-panel > ul {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  /* stylelint-enable no-descending-specificity */
 }
 
-/* tools */
-header nav .nav-tools {
-  grid-area: tools;
+/* ===== Large desktop (>= 1200px) ===== */
+@media (width >= 1200px) {
+  header nav .nav-trigger {
+    padding: 0 20px;
+  }
 }
